@@ -14,7 +14,7 @@ public class Test1Controller : ControllerBase,ITest1
     {
         _logger = logger;
     }
-
+    [HttpGet(nameof(returnString))]
     public async Task<string> returnString(int input)
     {
         await Task.Delay(10);

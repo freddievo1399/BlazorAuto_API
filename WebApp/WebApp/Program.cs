@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Reflection.Metadata;
 using BlazorAuto_API.Abstract;
 using BlazorAuto_API.AbstractServer;
 using WebApp;
@@ -13,7 +14,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
-builder.Services.RegisterScopedDependency(AssembliesUtil.GetAssemblies().GetInstances<IScopedDependencyRegistrar>());
+builder.Services.AddScoped(typeof(IExcuteService<>), typeof(ExcuteService<>));
+builder.Services.RegisterScopedDependency(AssembliesUtil.GetAssemblies().GetInstances<IScopedDependencyRegistrar>(),
+    (Regiter, Services) => { Regiter.RegisterServices(Services); });
 builder.Logging.AddConsole();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();

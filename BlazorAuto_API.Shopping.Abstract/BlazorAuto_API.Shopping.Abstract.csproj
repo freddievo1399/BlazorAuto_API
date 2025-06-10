@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorAuto_API.Abtract\BlazorAuto_API.Abstract.csproj" />
+  </ItemGroup>
+
 </Project>

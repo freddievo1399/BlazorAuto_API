@@ -1,5 +1,5 @@
 ﻿@page "/test1"
-@inject ITest1 ITest1;
+@inject IExcuteService<ITest1> IExcuteServi;
 <div class="my-component">
 	This component is defined in the <strong>BlazorAuto_API.Shopping.Blazor</strong><strong>@message</strong/> library.
 </div>
@@ -9,7 +9,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		await Task.Delay(1000);
-		message = await ITest1.returnString(1);
+		message = await IExcuteServi.Excute((x)=>x.returnString(1));
 		await base.OnInitializedAsync();
 	}
 }
