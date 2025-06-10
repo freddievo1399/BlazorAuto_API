@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\BlazorAuto_API.AbstractServer\BlazorAuto_API.AbstractServer.csproj" />
+		<ProjectReference Include="..\..\BlazorAuto_API.Shopping.Blazor\BlazorAuto_API.Shopping.Blazor.csproj" />
+		<ProjectReference Include="..\..\BlazorAuto_API.Shopping.Server\BlazorAuto_API.Shopping.Server.csproj" />
+		<ProjectReference Include="..\WebApp.Client\WebApp.Client.csproj" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Util\" />
+	</ItemGroup>
+
+</Project>

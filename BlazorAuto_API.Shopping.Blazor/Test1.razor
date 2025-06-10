@@ -1,0 +1,15 @@
+﻿@page "/test1"
+@inject ITest1 ITest1;
+<div class="my-component">
+	This component is defined in the <strong>BlazorAuto_API.Shopping.Blazor</strong><strong>@message</strong/> library.
+</div>
+@code {
+	
+	string message = "Hello from BlazorAuto_API.Shopping.Blazor.Test1";
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(1000);
+		message = await ITest1.returnString(1);
+		await base.OnInitializedAsync();
+	}
+}

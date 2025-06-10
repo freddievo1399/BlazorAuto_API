@@ -1,0 +1,28 @@
+﻿@using System.Reflection
+@using WebApp.Abstract
+@inject ILoadAssemlyBlazor Load ;
+
+@if (OperatingSystem.IsBrowser())
+{
+	<p>Đây là Blazor WebAssembly (client-side)</p>
+}
+else
+{
+	<p>Đây là Blazor Server (server-side)</p>
+}
+<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="AdditionalAssemblies">
+	<Found Context="routeData">
+		<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+		<FocusOnNavigate RouteData="routeData" Selector="h1" />
+	</Found>
+</Router>
+@code {
+	List<Assembly> AdditionalAssemblies = new();
+
+	protected override void OnInitialized()
+	{
+		var Temp = Load.LoadAssemblyAsync();
+
+		AdditionalAssemblies.AddRange(Temp);
+	}
+}
