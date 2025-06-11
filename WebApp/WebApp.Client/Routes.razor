@@ -10,7 +10,7 @@ else
 {
 	<p>Đây là Blazor Server (server-side)</p>
 }
-<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="AdditionalAssemblies">
+<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="AdditionalAssemblies" >
 	<Found Context="routeData">
 		<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
 		<FocusOnNavigate RouteData="routeData" Selector="h1" />

@@ -1,0 +1,8 @@
+﻿@* @rendermode InteractiveAuto *@
+
+@code {
+	protected string GetSrcFileNamespace(string relSrc)
+	{
+		return $"./_content/{this.GetType().Namespace}/{relSrc}";
+	}
+}

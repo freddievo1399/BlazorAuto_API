@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using BlazorAuto_API.Abstract;
 using BlazorAuto_API.AbstractServer;
+using Microsoft.EntityFrameworkCore;
 using WebApp;
 using WebApp.Abstract;
 using WebApp.Components;
@@ -15,8 +16,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
 builder.Services.AddScoped(typeof(IExcuteService<>), typeof(ExcuteService<>));
-builder.Services.RegisterScopedDependency(AssembliesUtil.GetAssemblies().GetInstances<IScopedDependencyRegistrar>(),
-    (Regiter, Services) => { Regiter.RegisterServices(Services); });
+builder.Services.RegisterScopedDependency(AssembliesUtil.GetAssemblies().GetInstances<IScopedDependencyRegistrar>());
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+           options.UseSqlServer(builder.Configuration.GetConnectionString("Sqlserver")));
 builder.Logging.AddConsole();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();

@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlazorAuto_API.Abtract\BlazorAuto_API.Abstract.csproj" />
     <ProjectReference Include="..\BlazorAuto_API.BaseUIBlazor\BlazorAuto_API.BaseUIBlazor.csproj" />
     <ProjectReference Include="..\BlazorAuto_API.Shopping.Abstract\BlazorAuto_API.Shopping.Abstract.csproj" />
   </ItemGroup>

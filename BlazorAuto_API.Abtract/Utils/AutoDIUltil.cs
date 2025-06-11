@@ -9,11 +9,11 @@ namespace BlazorAuto_API.Abstract
 {
     public static class AutoDIUltil
     {
-        public static void RegisterScopedDependency(this IServiceCollection services, IEnumerable<IScopedDependencyRegistrar> scopedDependencyRegistrars,Action<IScopedDependencyRegistrar,IServiceCollection> action)
+        public static void RegisterScopedDependency(this IServiceCollection services, IEnumerable<IScopedDependencyRegistrar> scopedDependencyRegistrars)
         {
             foreach (var registrar in scopedDependencyRegistrars)
             {
-                action.Invoke(registrar, services);
+                registrar.RegisterServices(services);
             }
         }
     }
