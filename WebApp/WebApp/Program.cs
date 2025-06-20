@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Reflection.Metadata;
 using BlazorAuto_API.Abstract;
@@ -17,14 +18,23 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
 builder.Services.AddScoped(typeof(IExcuteService<>), typeof(ExcuteService<>));
 builder.Services.RegisterScopedDependency(AssembliesUtil.GetAssemblies().GetInstances<IScopedDependencyRegistrar>());
+var abc = builder.Configuration.GetConnectionString("Sqlserver");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
            options.UseSqlServer(builder.Configuration.GetConnectionString("Sqlserver")));
+
+
 builder.Logging.AddConsole();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
+//auto migrate database
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate(); // Apply all pending migrations
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\BlazorAuto_API.AbstractServer\BlazorAuto_API.AbstractServer.csproj" />
+		<ProjectReference Include="..\BlazorAuto_API.Shopping.Abstract\BlazorAuto_API.Shopping.Abstract.csproj" />
+	</ItemGroup>
+
+</Project>

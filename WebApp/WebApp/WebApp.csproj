@@ -10,8 +10,14 @@
 		<ProjectReference Include="..\..\BlazorAuto_API.AbstractServer\BlazorAuto_API.AbstractServer.csproj" />
 		<ProjectReference Include="..\..\BlazorAuto_API.Shopping.Blazor\BlazorAuto_API.Shopping.Blazor.csproj" />
 		<ProjectReference Include="..\..\BlazorAuto_API.Shopping.Server\BlazorAuto_API.Shopping.Server.csproj" />
+		<ProjectReference Include="..\..\BlazorAuto_API.StoreManager.Blazor\BlazorAuto_API.StoreManager.Blazor.csproj" />
+		<ProjectReference Include="..\..\BlazorAuto_API.StoreManager.Server\BlazorAuto_API.StoreManager.Server.csproj" />
 		<ProjectReference Include="..\WebApp.Client\WebApp.Client.csproj" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.15">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
