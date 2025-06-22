@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
+using Syncfusion.Blazor;
 
 namespace BlazorAuto_API.AbstractServer
 {
     public class ApplicationDbContext : DbContext
     {
+        IDbContextTransaction _transaction = null;
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
@@ -75,6 +70,40 @@ namespace BlazorAuto_API.AbstractServer
                 }
             }
             base.OnModelCreating(modelBuilder);
+        }
+        public ApplicationDbContext BeginTransaction()
+        {
+            if (_transaction != null)
+            {
+                _transaction = this.Database.BeginTransaction();
+            }
+            return this;
+        }
+        public ApplicationDbContext Connection()
+        {
+            return this;
+        }
+
+        public IQueryable<T> GetData<T>(DataManagerRequest managerRequest, Action<IQueryable<T>>? query = null) where T : EntityBase
+        {
+            var Entity = this.Set<T>();
+            if (query != null)
+            {
+                query?.Invoke(Entity);
+            }
+            var rlt = DataOperations.Execute(Entity, managerRequest);
+            return rlt;
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            this.SaveChanges();
+            if (_transaction != null)
+            {
+                await _transaction.CommitAsync();
+                await _transaction.DisposeAsync();
+            }
+            await base.DisposeAsync();
         }
     }
 }

@@ -5,12 +5,15 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using RestEase;
-namespace BlazorAuto_API.Shopping.Abstract
+using Syncfusion.Blazor;
+namespace BlazorAuto_API.Shopping.Abstract;
+
+[BasePath("/api/base/Test1")]
+public interface ITest1
 {
-    [BasePath("/api/base/Test1")]
-    public interface ITest1
-    {
-        [Get(nameof(returnString))]
-        Task<string> returnString(int input);
-    }
+    [Get(nameof(ReturnString))]
+    Task<string> ReturnString(int input);
+
+    [Post(nameof(TestQuery))]
+    Task<string> TestQuery([Body] DataManagerRequest input);
 }

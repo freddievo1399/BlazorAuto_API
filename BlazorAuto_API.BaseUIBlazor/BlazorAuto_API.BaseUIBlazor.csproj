@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
@@ -13,10 +13,15 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.14" />
+
 	</ItemGroup>
 
 	<ItemGroup>
 		<Folder Include="Ultil\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\BlazorAuto_API.Abtract\BlazorAuto_API.Abstract.csproj" />
 	</ItemGroup>
 
 </Project>

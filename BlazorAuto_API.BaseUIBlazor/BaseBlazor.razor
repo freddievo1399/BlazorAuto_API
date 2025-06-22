@@ -1,6 +1,9 @@
-﻿@* @rendermode InteractiveAuto *@
+﻿@code {
+	protected string GetSrcFileNamespace()
+	{
+		return $"./_content/{this.GetType().Namespace}/{this.GetType().Name}.razor.js";
+	}
 
-@code {
 	protected string GetSrcFileNamespace(string relSrc)
 	{
 		return $"./_content/{this.GetType().Namespace}/{relSrc}";

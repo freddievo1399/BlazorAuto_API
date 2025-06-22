@@ -4,12 +4,14 @@ using System.Reflection.Metadata;
 using BlazorAuto_API.Abstract;
 using BlazorAuto_API.AbstractServer;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.Blazor;
 using WebApp;
 using WebApp.Abstract;
 using WebApp.Components;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddSyncfusionBlazor();
+SyncfusionLicense.Register();
 // Add services to the container.
 builder.Services.AddHttpClient();
 builder.Services.AddRazorComponents()

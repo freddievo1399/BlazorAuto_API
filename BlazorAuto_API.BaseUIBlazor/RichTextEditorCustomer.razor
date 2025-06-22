@@ -1,0 +1,104 @@
+﻿@using ComputerStore.Abtract
+@using Syncfusion.Blazor.RichTextEditor
+
+<SfRichTextEditor EnableAutoUrl @ref="sfRichTextEditor" onmouseup="Onclick" Readonly="IsViewer">
+    <RichTextEditorToolbarSettings Type="ToolbarType.MultiRow" Items="Items" Enable="!IsViewer" />
+    <RichTextEditorImageSettings Display="ImageDisplay.Break" ResizeByPercent  >
+        
+    </RichTextEditorImageSettings>
+    <p>Rich Text Editor allows to insert images from online source as well as local computer where you want to insert the image in your content.</p>
+    <p><b>Get started Quick Toolbar to click on the image</b></p>
+    <p>It is possible to add custom style on the selected image inside the Rich Text Editor through quick toolbar.</p>
+</SfRichTextEditor>
+@code {
+    [Parameter]
+    public bool IsViewer { get; set; } = false;
+
+    SfRichTextEditor sfRichTextEditor;
+    private List<ToolbarItemModel> Items = new List<ToolbarItemModel>()
+{
+    // --- Nhóm: Định dạng văn bản cơ bản ---
+    new ToolbarItemModel() { Command = ToolbarCommand.Bold },
+    new ToolbarItemModel() { Command = ToolbarCommand.Italic },
+    new ToolbarItemModel() { Command = ToolbarCommand.Underline },
+    new ToolbarItemModel() { Command = ToolbarCommand.StrikeThrough },
+    new ToolbarItemModel() { Command = ToolbarCommand.InlineCode },
+    new ToolbarItemModel() { Command = ToolbarCommand.SuperScript },
+    new ToolbarItemModel() { Command = ToolbarCommand.SubScript },
+    new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat },
+    new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+
+    // --- Nhóm: Font và màu sắc ---
+    new ToolbarItemModel() { Command = ToolbarCommand.FontName },
+    new ToolbarItemModel() { Command = ToolbarCommand.FontSize },
+    new ToolbarItemModel() { Command = ToolbarCommand.FontColor },
+    new ToolbarItemModel() { Command = ToolbarCommand.BackgroundColor },
+    new ToolbarItemModel() { Command = ToolbarCommand.LowerCase },
+    new ToolbarItemModel() { Command = ToolbarCommand.UpperCase },
+    new ToolbarItemModel() { Command = ToolbarCommand.HorizontalSeparator },
+
+    // --- Nhóm: Căn chỉnh và định dạng đoạn ---
+    new ToolbarItemModel() { Command = ToolbarCommand.Formats },
+    new ToolbarItemModel() { Command = ToolbarCommand.Alignments },
+    new ToolbarItemModel() { Command = ToolbarCommand.Blockquote },
+    new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
+    new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
+    new ToolbarItemModel() { Command = ToolbarCommand.NumberFormatList },
+    new ToolbarItemModel() { Command = ToolbarCommand.BulletFormatList },
+    new ToolbarItemModel() { Command = ToolbarCommand.Indent },
+    new ToolbarItemModel() { Command = ToolbarCommand.Outdent },
+    new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+
+    // --- Nhóm: Chèn nội dung ---
+    new ToolbarItemModel() { Command = ToolbarCommand.CreateLink },
+    new ToolbarItemModel() { Command = ToolbarCommand.RemoveLink },
+    new ToolbarItemModel() { Command = ToolbarCommand.Image },
+    // new ToolbarItemModel() { Command = ToolbarCommand.Audio },
+    new ToolbarItemModel() { Command = ToolbarCommand.Video },
+    new ToolbarItemModel() { Command = ToolbarCommand.CreateTable },
+    // new ToolbarItemModel() { Command = ToolbarCommand.InsertCode },
+    new ToolbarItemModel() { Command = ToolbarCommand.HorizontalSeparator },
+
+    // --- Nhóm: Tài liệu ---
+    new ToolbarItemModel() { Command = ToolbarCommand.ImportWord },
+    new ToolbarItemModel() { Command = ToolbarCommand.ExportWord },
+    new ToolbarItemModel() { Command = ToolbarCommand.ExportPdf },
+    new ToolbarItemModel() { Command = ToolbarCommand.Print },
+    new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+
+    // --- Nhóm: Điều hướng và thao tác ---
+    new ToolbarItemModel() { Command = ToolbarCommand.Undo },
+    new ToolbarItemModel() { Command = ToolbarCommand.Redo },
+    new ToolbarItemModel() { Command = ToolbarCommand.SourceCode },
+    new ToolbarItemModel() { Command = ToolbarCommand.FullScreen },
+    new ToolbarItemModel() { Command = ToolbarCommand.Maximize },
+    new ToolbarItemModel() { Command = ToolbarCommand.Minimize },
+};
+
+    public async Task<Result> AddMediaAsync(string mediaUrl, string mediaType)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(mediaUrl) || string.IsNullOrWhiteSpace(mediaType))
+                return "Media URL hoặc loại media không hợp lệ.";
+
+            string? htmlTag = mediaType.ToLower() switch
+            {
+                "img" => $"<img src='{mediaUrl}' alt='Image' style='max-width: 100%;' class='e-imgcenter' />",
+                "video" => $"<video controls style='max-width: 100%;'><source src='{mediaUrl}' type='video/mp4' class='e-video-center'>Trình duyệt không hỗ trợ video.</video>",
+                // "audio" => $"<audio controls><source src='{mediaUrl}' type='audio/mpeg'>Trình duyệt không hỗ trợ audio.</audio>",
+                _ => null
+            };
+
+            if (htmlTag == null)
+                return "Loại media không được hỗ trợ (chỉ hỗ trợ img, video, audio).";
+            await sfRichTextEditor.ExecuteCommandAsync(CommandName.InsertHTML, htmlTag);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
+    }
+
+}
