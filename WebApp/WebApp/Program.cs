@@ -24,6 +24,7 @@ var abc = builder.Configuration.GetConnectionString("Sqlserver");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
            options.UseSqlServer(builder.Configuration.GetConnectionString("Sqlserver")));
 
+builder.Services.AddScoped<SwalService>();
 
 builder.Logging.AddConsole();
 builder.Services.AddSwaggerGen();

@@ -11,4 +11,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<LazyAssemblyLoader>();
 builder.Services.AddScoped(typeof(IExcuteService<>), typeof(ExcuteService<>));
 builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
+builder.Services.AddScoped<SwalService>();
+
 await builder.Build().RunAsync();

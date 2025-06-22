@@ -1,0 +1,106 @@
+﻿@using BlazorAuto_API.Abstract
+@using Syncfusion.Blazor.Popups
+@inject SwalService SwalService
+
+@if (IsVisible)
+{
+	<div class="swal-overlay">
+		<div class="swal-dialog @TypeCss">
+			<div class="swal-header">
+				<span class="swal-title">@Title</span>
+			</div>
+			<div class="swal-body">
+				@if (swalType == SwalType.Loadding)
+				{
+					<div class="swal-spinner"></div>
+					<p>@Message</p>
+				}
+				else
+				{
+					<p>@Message</p>
+				}
+			</div>
+			@if (swalType != SwalType.Loadding)
+			{
+				<div class="swal-footer">
+					<button class="swal-btn ok" @onclick="OnConfirm">OK</button>
+					@if (swalType == SwalType.Confirm && ShowCancel)
+					{
+						<button class="swal-btn cancel" @onclick="OnCancel">Hủy</button>
+					}
+				</div>
+			}
+		</div>
+	</div>
+}
+
+
+@code {
+	private SfDialog DialogRef;
+	private string Title = "Xác nhận";
+	private string Message = "";
+	private bool IsVisible = false;
+	private bool ShowCancel = true;
+	private SwalType swalType = SwalType.Info;
+	private TaskCompletionSource<SwalResult> tcs;
+
+	private string TypeCss => swalType switch
+	{
+		SwalType.Info => "swal-info",
+		SwalType.Warning => "swal-warning",
+		SwalType.Confirm => "swal-confirm",
+		SwalType.Success => "swal-success",
+		SwalType.Error => "swal-error",
+		SwalType.Loadding => "swal-loading",
+		_ => ""
+	};
+
+	protected override void OnInitialized()
+	{
+		SwalService.OnShow = ShowDialog;
+	}
+
+	private Task<SwalResult> ShowDialog(string title, string message, SwalType type, bool showCancel = true)
+	{
+		Title = title;
+		Message = message;
+		ShowCancel = showCancel;
+		IsVisible = true;
+		swalType = type;
+
+		switch (type)
+		{
+			case SwalType.Loadding:
+				StateHasChanged();
+				return Task.FromResult(SwalResult.Confirmed); // hoặc giữ IsVisible để show spinner
+			case SwalType.Close:
+				IsVisible = false;
+				StateHasChanged();
+				return Task.FromResult(SwalResult.Confirmed);
+			default:
+				tcs = new TaskCompletionSource<SwalResult>();
+				break;
+		}
+
+		StateHasChanged();
+		return tcs.Task;
+	}
+
+	private void OnConfirm(MouseEventArgs args)
+	{
+		IsVisible = false;
+		tcs?.SetResult(SwalResult.Confirmed);
+	}
+
+	private void OnCancel(MouseEventArgs args)
+	{
+		IsVisible = false;
+		tcs?.SetResult(SwalResult.Canceled);
+	}
+
+	private void OnDismissed(MouseEventArgs args)
+	{
+		IsVisible = false;
+		tcs?.SetResult(SwalResult.Dismissed);
+	}
+}

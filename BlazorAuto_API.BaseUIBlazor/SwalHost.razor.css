@@ -1,0 +1,132 @@
+﻿/* Overlay phủ nền */
+.swal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Khung hộp thoại chính */
+.swal-dialog {
+    background-color: #fff;
+    border-radius: 10px;
+    min-width: 300px;
+    max-width: 420px;
+    padding: 0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-out;
+    overflow: hidden;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Header */
+.swal-header {
+    padding: 15px 20px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: white;
+}
+
+/* Nội dung */
+.swal-body {
+    padding: 20px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* Nút dưới */
+.swal-footer {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    border-top: 1px solid #eee;
+}
+
+/* Nút bấm */
+.swal-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+}
+
+    .swal-btn.ok {
+        background-color: #3085d6;
+        color: white;
+    }
+
+    .swal-btn.cancel {
+        background-color: #888;
+        color: white;
+    }
+
+    .swal-btn:hover {
+        opacity: 0.9;
+    }
+
+/* Màu theo loại thông báo */
+.swal-info .swal-header {
+    background-color: #2196f3;
+}
+
+.swal-warning .swal-header {
+    background-color: #ffc107;
+    color: black;
+}
+
+.swal-success .swal-header {
+    background-color: #28a745;
+}
+
+.swal-error .swal-header {
+    background-color: #dc3545;
+}
+
+.swal-confirm .swal-header {
+    background-color: #17a2b8;
+}
+
+.swal-loading .swal-header {
+    background-color: #6c757d;
+}
+
+/* Spinner loading */
+.swal-spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #2196f3;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 10px;
+    animation: spin 1s linear infinite;
+}
+
+/* Hiệu ứng */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

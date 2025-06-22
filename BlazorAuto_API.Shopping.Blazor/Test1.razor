@@ -1,5 +1,7 @@
 ﻿@page "/test1"
 @using Syncfusion.Blazor
+@inject SwalService SwalService
+
 @inject IExcuteService<ITest1> IExcuteServi;
 <div class="my-component">
 	This component is defined in the <strong class="heeh">BlazorAuto_API.Shopping.Blazor</strong><strong>@message</strong/> library.
@@ -24,6 +26,13 @@
 	}
 	private async Task AddImage()
 	{
+		var abc = await SwalService.Confirm("Thêm ảnh vào RichTextEditor", "Đang thêm ảnh vào RichTextEditor...");
+		if (abc== SwalResult.Confirmed)
+		{
+			await SwalService.Loading("Đang thêm ảnh vào RichTextEditor...");
 		await richTextEditorCustomer.AddMediaAsync(GetSrcFileNamespace("background.png"), "img");
+		await Task.Delay(1000);
+			await SwalService.Close();
+		}
 	}
 }
