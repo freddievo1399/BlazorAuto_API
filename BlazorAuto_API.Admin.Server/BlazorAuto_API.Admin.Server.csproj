@@ -10,4 +10,8 @@
 		<ProjectReference Include="..\BlazorAuto_API.Infrastructure\BlazorAuto_API.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Controller\" />
+	</ItemGroup>
+
 </Project>
