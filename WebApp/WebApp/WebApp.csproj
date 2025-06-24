@@ -7,9 +7,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\BlazorAuto_API.AbstractServer\BlazorAuto_API.AbstractServer.csproj" />
-		<ProjectReference Include="..\..\BlazorAuto_API.Shopping.Server\BlazorAuto_API.Shopping.Server.csproj" />
-		<ProjectReference Include="..\..\BlazorAuto_API.StoreManager.Server\BlazorAuto_API.StoreManager.Server.csproj" />
+		<ProjectReference Include="..\..\BlazorAuto_API.Admin.Server\BlazorAuto_API.Admin.Server.csproj" />
+		<ProjectReference Include="..\..\BlazorAuto_API.Customer.Server\BlazorAuto_API.Customer.Server.csproj" />
+		<ProjectReference Include="..\..\BlazorAuto_API.Infrastructure\BlazorAuto_API.Infrastructure.csproj" />
 		<ProjectReference Include="..\WebApp.Client\WebApp.Client.csproj" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 

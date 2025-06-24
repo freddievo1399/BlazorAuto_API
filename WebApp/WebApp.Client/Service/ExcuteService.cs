@@ -10,13 +10,11 @@ namespace WebApp.Client.Service
 {
     public class ExcuteService<T>: IExcuteService<T>
     {
-        HttpClient _httpClient;
         T Value;
 
         public ExcuteService(HttpClient httpClient)
         {
-            _httpClient = httpClient;
-            Value = RestClient.For<T>(httpClient.BaseAddress);
+            Value = RestClient.For<T>(httpClient);
         }
 
         public V Excute<V>(Func<T, V> func)
