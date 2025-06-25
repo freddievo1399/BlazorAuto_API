@@ -8,7 +8,7 @@ using RestEase;
 
 namespace WebApp.Client.Service
 {
-    public class ExcuteService<T>: IExcuteService<T>
+    public class ExcuteService<T> : IExcuteService<T>
     {
         T Value;
 
@@ -19,7 +19,7 @@ namespace WebApp.Client.Service
 
         public V Excute<V>(Func<T, V> func)
         {
-            
+
             return func.Invoke(Value);
         }
     }

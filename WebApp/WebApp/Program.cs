@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using BlazorAuto_API.Abstract;
 using BlazorAuto_API.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor;
 using WebApp;
@@ -13,6 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSyncfusionBlazor();
 SyncfusionLicense.Register();
 // Add services to the container.
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 builder.Services.AddHttpClient();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()

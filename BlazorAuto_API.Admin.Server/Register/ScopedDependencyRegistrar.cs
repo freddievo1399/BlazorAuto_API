@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlazorAuto_API.Abstract;
+using BlazorAuto_API.Admin.Abstract;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlazorAuto_API.Admin.Server
@@ -12,7 +14,7 @@ namespace BlazorAuto_API.Admin.Server
     {
         public void RegisterServices(IServiceCollection services)
         {
-            //services.AddScoped<ITest1,Test1Controller>();
+            services.AddScoped<ICategoriesService, CategoriesController>();
 
         }
     }

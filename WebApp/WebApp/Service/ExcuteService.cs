@@ -7,7 +7,7 @@ using BlazorAuto_API.Abstract;
 
 namespace WebApp
 {
-    public class ExcuteService<T>: IExcuteService<T>
+    public class ExcuteService<T> : IExcuteService<T>
     {
         T _service { get; set; }
         public ExcuteService() { }
@@ -17,7 +17,7 @@ namespace WebApp
         }
         public V Excute<V>(Func<T, V> func)
         {
-            return func.Invoke(_service);
+            return func(_service);
         }
     }
 }

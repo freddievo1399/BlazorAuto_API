@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ComputerStore.Abtract;
+namespace BlazorAuto_API.Abstract;
 
 public class Result
 {
@@ -194,7 +194,7 @@ public class PagedResultsOf<T> : ResultBaseOf<T>
 
     public static implicit operator PagedResultsOf<T>(List<T> data)
     {
-        return new PagedResultsOf<T> { Success = true, Items = null, TotalCount = data.Count() };
+        return new PagedResultsOf<T> { Success = true, Items = data, TotalCount = data.Count() };
     }
 }
 

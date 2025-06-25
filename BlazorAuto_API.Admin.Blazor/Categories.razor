@@ -1,0 +1,18 @@
+﻿@page "/categorie"
+@inject IExcuteService<ICategoriesService> CategoriesService;
+
+<SfGrid @ref=grid TValue="CategoriesModel">
+	<SfDataManager Adaptor="Adaptors.CustomAdaptor">
+		<CustomAdaptorGridBlazor GetDataMethod="GetData"></CustomAdaptorGridBlazor>
+	</SfDataManager>
+
+</SfGrid>
+<Syncfusion.Blazor.Buttons.SfButton OnClick="()=>grid.Refresh()"></Syncfusion.Blazor.Buttons.SfButton>
+@code {
+	private SfGrid<CategoriesModel> grid;
+	private async Task<PagedResultsOf<CategoriesModel>> GetData(DataManagerRequest request)
+	{
+		var rsp = await CategoriesService.Excute(x => x.GetData(request));
+		return rsp;
+	}
+}

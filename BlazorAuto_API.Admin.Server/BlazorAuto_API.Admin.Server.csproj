@@ -7,11 +7,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\BlazorAuto_API.Admin.Abstract\BlazorAuto_API.Admin.Abstract.csproj" />
 		<ProjectReference Include="..\BlazorAuto_API.Infrastructure\BlazorAuto_API.Infrastructure.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Controller\" />
 	</ItemGroup>
 
 </Project>

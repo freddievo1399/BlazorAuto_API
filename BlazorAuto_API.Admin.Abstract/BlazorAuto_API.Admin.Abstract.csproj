@@ -10,9 +10,4 @@
 		<ProjectReference Include="..\BlazorAuto_API.Abtract\BlazorAuto_API.Abstract.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Model\" />
-		<Folder Include="Interface\" />
-	</ItemGroup>
-
 </Project>
