@@ -16,7 +16,10 @@ namespace BlazorAuto_API.Admin.Abstract
         Task<ResultOf<CategoriesModel>> FindByGuid(Guid Guid);
 
         [Post(nameof(GetData))]
-        Task<PagedResultsOf<CategoriesModel>> GetData([Body] DataManagerRequest input);
-        
+        Task<PagedResultsOf<CategoriesModel>> GetData([Body] DataRequestDto Request);
+
+        [Post(nameof(Add))]
+        Task<Result> Add([Body] CategoriesCreateModel Request);
+
     }
 }

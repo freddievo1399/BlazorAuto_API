@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using BlazorAuto_API.Abstract;
 using BlazorAuto_API.Admin.Abstract;
 using BlazorAuto_API.Infrastructure;
+using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Syncfusion.Blazor;
 using Syncfusion.Blazor.Data;
 
 namespace BlazorAuto_API.Admin.Server
@@ -19,52 +19,86 @@ namespace BlazorAuto_API.Admin.Server
 
     public class CategoriesController : ControllerBase, ICategoriesService
     {
-        ApplicationDbContext _applicationDbContext;
+        IDbContext _DbContext;
 
-        public CategoriesController(ApplicationDbContext applicationDbContext)
+        public CategoriesController(IDbContext DbContext)
         {
-            _applicationDbContext = applicationDbContext;
+            _DbContext = DbContext;
         }
-
-        [HttpGet(nameof(FindByGuid))]
-        public Task<ResultOf<CategoriesModel>> FindByGuid(Guid Guid)
+        [HttpPost(nameof(Add))]
+        public async Task<Result> Add([FromBody] CategoriesCreateModel Request)
         {
-            throw new NotImplementedException();
+            try
+            {
+
+                using (var db = _DbContext.Connection())
+                {
+                    await db.Set<EntityCategory>().AddAsync(new EntityCategory()
+                    {
+                        Name = Request.Name,
+                        Description = Request.Description,
+                        CreatedBy = "test"
+                    });
+                    var i = await db.SaveChangesAsync();
+
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        [HttpGet(nameof(FindByGuid))]
+        public async Task<ResultOf<CategoriesModel>> FindByGuid(Guid Guid)
+        {
+            try
+            {
+
+                using (var db = _DbContext.Connection())
+                {
+                    var res = await db.Set<EntityCategory>().Include(x => x.ProductCategories).ThenInclude(x => x.Product).Select(x => new CategoriesModel()
+                    {
+                        Guid = Guid,
+                        Name = x.Name,
+                        Description = x.Description,
+                        ProductNames = x.ProductCategories.Select(x => x.Product.Name).ToList(),
+                    }).FirstOrDefaultAsync(x => x.Guid == Guid);
+                    if (res != null)
+                    {
+                        return res;
+
+                    }
+                    return "Không tim thấy";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
         [HttpPost(nameof(GetData))]
-        public async Task<PagedResultsOf<CategoriesModel>> GetData([FromBody] DataManagerRequest input)
+        public async Task<PagedResultsOf<CategoriesModel>> GetData([FromBody] DataRequestDto Request)
         {
-            if (_applicationDbContext == null)
+            try
             {
-                return "Context null";
+                var rstTemp = await _DbContext.GetData<EntityCategory>(Request, x => x.Include(x => x.ProductCategories).ThenInclude(x => x.Product));
+                var rst = PagedResultsOf<CategoriesModel>.Ok(
+                    rstTemp.Items.Select(x => new CategoriesModel
+                    {
+                        Description = x.Description,
+                        Guid = x.Guid,
+                        Name = x.Name,
+                        ProductNames = x.ProductCategories.Select(pc => pc.Product.Name).ToList()
+                    }), rstTemp.TotalCount);
+                return rst;
+            }
+            catch (Exception)
+            {
+                return PagedResultsOf<CategoriesModel>.Error("An error occurred while fetching data.");
             }
 
-            IQueryable<EntityCategory> query = _applicationDbContext.Set<EntityCategory>().AsQueryable();
 
-            // 1. Lọc dữ liệu
-            if (input.Where != null && input.Where.Any())
-                query = DataOperations.PerformFiltering(query, input.Where, "and") ;
-
-            // 2. Tìm kiếm
-            if (input.Search != null && input.Search.Any())
-                query = DataOperations.PerformSearching(query, input.Search) ;
-
-            // 3. Sắp xếp
-            if (input.Sorted != null && input.Sorted.Any())
-                query = DataOperations.PerformSorting(query, input.Sorted) ;
-
-            // 4. Đếm số bản ghi (bắt buộc để phân trang)
-            var count = await query.CountAsync();
-
-            // 5. Phân trang
-            if (input.Skip > 0)
-                query = query.Skip(input.Skip);
-            if (input.Take > 0)
-                query = query.Take(input.Take);
-
-            // 6. Trả kết quả
-            var result = await query.Select(x=>new CategoriesModel()).ToListAsync();
-            return  PagedResultsOf<CategoriesModel>.Ok(result, count);
 
         }
 

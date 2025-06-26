@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Azure.Core;
+using BlazorAuto_API.Abstract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -6,12 +8,13 @@ using Syncfusion.Blazor;
 
 namespace BlazorAuto_API.Infrastructure
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : DbContext, IDbContext
     {
         IDbContextTransaction? _transaction = null;
+        static DbContextOptions<ApplicationDbContext> _option;
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-
+            _option = options;
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -74,37 +77,61 @@ namespace BlazorAuto_API.Infrastructure
         }
         public ApplicationDbContext BeginTransaction()
         {
+            var transaction = new ApplicationDbContext(_option);
             if (_transaction != null)
             {
-                _transaction = this.Database.BeginTransaction();
+                _transaction = transaction.Database.BeginTransaction();
             }
-            return this;
+            return transaction;
         }
         public ApplicationDbContext Connection()
         {
-            return this;
+            var transaction = new ApplicationDbContext(_option);
+            return transaction;
         }
 
-        public IQueryable<T> GetData<T>(DataManagerRequest managerRequest, Action<IQueryable<T>>? query = null) where T : EntityBase
+        public async Task<PagedResultsOf<T>> GetData<T>(DataRequestDto DataManagerDto, Action<IQueryable<T>>? queryExtend = null) where T : EntityBase
         {
-            var Entity = this.Set<T>();
-            if (query != null)
+            using (var transaction = Connection())
             {
-                query?.Invoke(Entity);
+                var DataManagerRequest = DataManagerDto.ToRequest();
+                var query = transaction.Set<T>().AsQueryable();
+                if (queryExtend != null)
+                {
+                    queryExtend.Invoke(query);
+                }
+
+
+                if (DataManagerRequest.Where != null && DataManagerRequest.Where.Any())
+                    query = DataOperations.PerformFiltering(query, DataManagerRequest.Where, "and");
+
+                if (DataManagerRequest.Search != null && DataManagerRequest.Search.Any())
+                    query = DataOperations.PerformSearching(query, DataManagerRequest.Search);
+
+                if (DataManagerRequest.Sorted != null && DataManagerRequest.Sorted.Any())
+                    query = DataOperations.PerformSorting(query, DataManagerRequest.Sorted);
+
+                var count = await query.AsNoTracking().CountAsync();
+
+                if (DataManagerRequest.Skip > 0)
+                    query = query.Skip(DataManagerRequest.Skip);
+                if (DataManagerRequest.Take > 0)
+                    query = query.Take(DataManagerRequest.Take);
+
+                var result = await query.AsNoTracking().ToListAsync();
+                return PagedResultsOf<T>.Ok(result, count);
             }
-            var rlt = DataOperations.Execute(Entity, managerRequest);
-            return rlt;
         }
 
         public override async ValueTask DisposeAsync()
         {
-            this.SaveChanges();
+
             if (_transaction != null)
             {
-                await _transaction.CommitAsync();
                 await _transaction.DisposeAsync();
             }
             await base.DisposeAsync();
         }
+
     }
 }

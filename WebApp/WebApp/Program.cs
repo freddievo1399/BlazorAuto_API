@@ -5,6 +5,7 @@ using BlazorAuto_API.Abstract;
 using BlazorAuto_API.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 using Syncfusion.Blazor;
 using WebApp;
 using WebApp.Abstract;
@@ -18,7 +19,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
-
+builder.Services.AddMudServices();
 builder.Services.AddHttpClient();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
@@ -30,6 +31,7 @@ var abc = builder.Configuration.GetConnectionString("Sqlserver");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
            options.UseSqlServer(builder.Configuration.GetConnectionString("Sqlserver")));
 
+builder.Services.AddScoped<IDbContext,ApplicationDbContext>();
 builder.Services.AddScoped<SwalService>();
 
 builder.Logging.AddConsole();

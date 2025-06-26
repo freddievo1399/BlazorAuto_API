@@ -1,6 +1,7 @@
 using BlazorAuto_API.Abstract;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
+using MudBlazor.Services;
 using Syncfusion.Blazor;
 using WebApp.Abstract;
 using WebApp.Client.Service;
@@ -12,5 +13,5 @@ builder.Services.AddScoped<LazyAssemblyLoader>();
 builder.Services.AddScoped(typeof(IExcuteService<>), typeof(ExcuteService<>));
 builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
 builder.Services.AddScoped<SwalService>();
-
+builder.Services.AddMudServices();
 await builder.Build().RunAsync();
