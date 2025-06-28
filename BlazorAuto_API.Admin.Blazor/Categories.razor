@@ -1,8 +1,7 @@
 ﻿@page "/admin/categorie"
 
 @inject IExcuteService<ICategoriesService> CategoriesService;
-
-<SfButton OnClick="OpenDialogAddCategori">Add</SfButton>
+<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
 <MudDialog @ref=DialogAddCategori Class="container-md">
 	<TitleContent>
 		<MudText>Tạo Danh mục hàng</MudText>
@@ -10,7 +9,7 @@
 	<DialogContent>
 		<EditForm id="formsubmit" Model=categoriesCreateModel OnValidSubmit="OnValidSubmit">
 			<DataAnnotationsValidator />
-			<ValidationSummary />
+			@* <ValidationSummary   /> *@
 			<MudTextField T="string" @bind-Text=categoriesCreateModel.Name Label="Tên" InputMode="InputMode.text"></MudTextField>
 			<MudTextField T="string" @bind-Text=categoriesCreateModel.Description Label="Mô tả"></MudTextField>
 		</EditForm>
@@ -51,9 +50,8 @@
 		</GridColumn>
 	</GridColumns>
 </SfGrid>
-<SfButton OnClick="()=>grid.Refresh()">Refesh</SfButton>
 @code {
-	CategoriesCreateModel categoriesCreateModel;
+	CategoriesCreateModel categoriesCreateModel =null;
 	MudDialog DialogAddCategori;
 	private SfGrid<CategoriesModel> grid;
 	private async Task<PagedResultsOf<CategoriesModel>> GetData(DataManagerRequest request)

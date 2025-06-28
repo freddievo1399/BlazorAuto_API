@@ -30,7 +30,6 @@ namespace BlazorAuto_API.Admin.Server
         {
             try
             {
-
                 using (var db = _DbContext.Connection())
                 {
                     await db.Set<EntityCategory>().AddAsync(new EntityCategory()

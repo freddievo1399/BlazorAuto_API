@@ -36,7 +36,10 @@ builder.Services.AddScoped<SwalService>();
 
 builder.Logging.AddConsole();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidateModelAttribute>();
+});
 builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 

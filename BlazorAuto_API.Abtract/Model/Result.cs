@@ -98,13 +98,8 @@ public class ResultOf<T> : Result
         return new ResultOf<T>(true, result.Item2, result.Item1);
     }
 }
-public class ResultBaseOf<T>
-{
-    public bool Success { get; set; }
 
-    public string Message { get; set; }
-}
-public class ResultsOf<T> : ResultBaseOf<T>
+public class ResultsOf<T> : Result
 {
 
     public IEnumerable<T> Items { get; set; } = new List<T>();
@@ -162,7 +157,7 @@ public class ResultsOf<T> : ResultBaseOf<T>
     }
 }
 
-public class PagedResultsOf<T> : ResultBaseOf<T>
+public class PagedResultsOf<T> : Result
 {
 
     public IEnumerable<T> Items { get; set; }

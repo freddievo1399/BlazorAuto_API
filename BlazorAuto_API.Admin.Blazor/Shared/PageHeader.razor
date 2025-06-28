@@ -1,0 +1,24 @@
+﻿<div class="row">
+	<div class="col-auto mr-auto">PageTitle</div>
+	<div class="col-auto">
+		<MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+			@if (AddEvent.HasDelegate)
+			{
+				<MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddEvent" />
+			}
+			@if (RefeshEvent.HasDelegate)
+			{
+				<MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="RefeshEvent" />
+			}
+		</MudButtonGroup>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public string PageTitle { get; set; }
+	[Parameter]
+	public EventCallback AddEvent { get; set; }
+	[Parameter]
+	public EventCallback RefeshEvent { get; set; }
+}
