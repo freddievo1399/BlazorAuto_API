@@ -28,10 +28,10 @@ builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
 builder.Services.AddScoped(typeof(IExcuteService<>), typeof(ExcuteService<>));
 builder.Services.RegisterScopedDependency(AssembliesUtil.GetAssemblies().GetInstances<IScopedDependencyRegistrar>());
 var abc = builder.Configuration.GetConnectionString("Sqlserver");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
            options.UseSqlServer(builder.Configuration.GetConnectionString("Sqlserver")));
 
-builder.Services.AddScoped<IDbContext,ApplicationDbContext>();
+builder.Services.AddScoped<IDbContext, DbConnectionProvider>();
 builder.Services.AddScoped<SwalService>();
 
 builder.Logging.AddConsole();

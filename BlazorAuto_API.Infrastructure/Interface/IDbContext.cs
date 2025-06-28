@@ -14,6 +14,5 @@ namespace BlazorAuto_API.Infrastructure
         public ApplicationDbContext Connection();
 
         public Task<PagedResultsOf<T>> GetData<T>(DataRequestDto DataManagerDto, Action<IQueryable<T>>? queryExtend = null) where T : EntityBase;
-
     }
 }

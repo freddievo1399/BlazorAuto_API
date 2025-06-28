@@ -1,0 +1,82 @@
+﻿@page "/admin/product"
+
+@inject IExcuteService<ICategoriesService> CategoriesService;
+<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
+<MudDialog @ref=DialogAddCategori Class="container-md">
+	<TitleContent>
+		<MudText>Tạo Danh mục hàng</MudText>
+	</TitleContent>
+	<DialogContent>
+		<EditForm id="formsubmit" Model=categoriesCreateModel OnValidSubmit="OnValidSubmit">
+			<DataAnnotationsValidator />
+			@* <ValidationSummary   /> *@
+			<MudTextField T="string" @bind-Text=categoriesCreateModel.Name Label="Tên" InputMode="InputMode.text"></MudTextField>
+			<MudTextField T="string" @bind-Text=categoriesCreateModel.Description Label="Mô tả"></MudTextField>
+		</EditForm>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="@(()=>DialogAddCategori.CloseAsync())">Cancel</MudButton>
+		<MudButton Color="Color.Primary" ButtonType="MudBlazor.ButtonType.Submit" form="formsubmit">OK</MudButton>
+	</DialogActions>
+</MudDialog>
+
+<SfGrid @ref=grid TValue="CategoriesModel">
+	<SfDataManager Adaptor="Adaptors.CustomAdaptor">
+		<CustomAdaptorGridBlazor GetDataMethod="GetData"></CustomAdaptorGridBlazor>
+	</SfDataManager>
+	<GridColumns>
+		<GridColumn Field="@(nameof(CategoriesModel.Name))"></GridColumn>
+		<GridColumn Field="@(nameof(CategoriesModel.Description))"></GridColumn>
+		<GridColumn Field="@(nameof(CategoriesModel.ProductNames))">
+			<Template>
+				@{
+					var employee = (context as CategoriesModel);
+					@if (employee.ProductNames == null)
+					{
+
+						<div>
+							@string.Join(",", employee?.ProductNames ?? [])
+						</div>
+					}
+					else
+					{
+						<div>
+
+							""
+						</div>
+					}
+				}
+			</Template>
+		</GridColumn>
+	</GridColumns>
+</SfGrid>
+@code {
+	CategoriesCreateModel categoriesCreateModel = null;
+	MudDialog DialogAddCategori;
+	private SfGrid<CategoriesModel> grid;
+	private async Task<PagedResultsOf<CategoriesModel>> GetData(DataManagerRequest request)
+	{
+		var rsp = await CategoriesService.Excute(x => x.GetData(request));
+		return rsp;
+	}
+	private async Task OpenDialogAddCategori()
+	{
+		categoriesCreateModel = new();
+		await DialogAddCategori.ShowAsync();
+	}
+	private async Task OnValidSubmit()
+	{
+		await Swal.Loading("Vui lòng đợi");
+		var rsp = await CategoriesService.Excute(x => x.Add(categoriesCreateModel));
+		if (rsp.Success)
+		{
+			await Swal.Close();
+			await DialogAddCategori.CloseAsync();
+			await grid.Refresh();
+		}
+		else
+		{
+			await Swal.Warning(rsp.Message);
+		}
+	}
+}
