@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace BlazorAuto_API.Admin.Abstract
 {
-    public class ProductModel
+    public class CategoriesInfoModel
     {
-        [MaxLength(100)]
+        public Guid Guid { get; set; }
         public string Name { get; set; } = default!;
 
-        [MaxLength(500)]
+        [MaxLength(255)]
         public string? Description { get; set; }
     }
 }

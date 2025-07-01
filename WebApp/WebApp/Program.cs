@@ -1,10 +1,12 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Reflection.Metadata;
 using BlazorAuto_API.Abstract;
+using BlazorAuto_API.BaseUIBlazor;
 using BlazorAuto_API.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using MudBlazor.Services;
 using Syncfusion.Blazor;
 using WebApp;
@@ -25,7 +27,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
-builder.Services.AddScoped(typeof(IExcuteService<>), typeof(ExcuteService<>));
+builder.Services.AddScoped(typeof(IExecuteService<>), typeof(ExecuteService<>));
 builder.Services.RegisterScopedDependency(AssembliesUtil.GetAssemblies().GetInstances<IScopedDependencyRegistrar>());
 var abc = builder.Configuration.GetConnectionString("Sqlserver");
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
@@ -35,7 +37,26 @@ builder.Services.AddScoped<IDbContext, DbConnectionProvider>();
 builder.Services.AddScoped<SwalService>();
 
 builder.Logging.AddConsole();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("Admin", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Admin API",
+        Version = "v1"
+    });
+
+    options.SwaggerDoc("Customer", new OpenApiInfo
+    {
+        Title = "Customer API",
+        Version = "v1"
+    });
+
+    // Giữ đoạn này nếu bạn có nhiều group
+    options.DocInclusionPredicate((groupName, apiDesc) =>
+    {
+        return apiDesc.GroupName == groupName;
+    });
+});
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidateModelAttribute>();
@@ -54,7 +75,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/Admin/swagger.json", "Admin API v1");
+        options.SwaggerEndpoint("/swagger/Customer/swagger.json", "Customer API v1");
+    });
 }
 else
 {

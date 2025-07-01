@@ -9,14 +9,17 @@ using Syncfusion.Blazor;
 
 namespace BlazorAuto_API.Admin.Abstract
 {
-    [BasePath("/api/admin/Categories")]
-    public interface ICategoriesService
+    [BasePath("/api/admin/CategoriesManager")]
+    public interface ICategoriesManagerService
     {
         [Get(nameof(FindByGuid))]
-        Task<ResultOf<CategoriesModel>> FindByGuid(Guid Guid);
+        Task<ResultOf<CategoriesInfoModel>> FindByGuid(Guid Guid);
+
+        [Post(nameof(Remove))]
+        Task<Result> Remove(Guid Guid);
 
         [Post(nameof(GetData))]
-        Task<PagedResultsOf<CategoriesModel>> GetData([Body] DataRequestDto Request);
+        Task<PagedResultsOf<CategoriesInfoModel>> GetData([Body] DataRequestDto Request);
 
         [Post(nameof(Add))]
         Task<Result> Add([Body] CategoriesCreateModel Request);

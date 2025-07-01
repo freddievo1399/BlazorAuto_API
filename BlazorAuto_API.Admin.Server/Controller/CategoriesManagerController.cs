@@ -15,13 +15,12 @@ namespace BlazorAuto_API.Admin.Server
 {
     [ApiController]
     [Route("/api/admin/[controller]")]
-
-
-    public class CategoriesController : ControllerBase, ICategoriesService
+    [ApiExplorerSettings(GroupName = "Admin")]
+    public class CategoriesManagerController : ControllerBase, ICategoriesManagerService
     {
         IDbContext _DbContext;
 
-        public CategoriesController(IDbContext DbContext)
+        public CategoriesManagerController(IDbContext DbContext)
         {
             _DbContext = DbContext;
         }
@@ -32,12 +31,13 @@ namespace BlazorAuto_API.Admin.Server
             {
                 using (var db = _DbContext.Connection())
                 {
-                    await db.Set<EntityCategory>().AddAsync(new EntityCategory()
+                    var abc = new EntityCategory()
                     {
                         Name = Request.Name,
                         Description = Request.Description,
                         CreatedBy = "test"
-                    });
+                    };
+                    await db.Set<EntityCategory>().AddAsync(abc);
                     var i = await db.SaveChangesAsync();
 
                 }
@@ -49,19 +49,18 @@ namespace BlazorAuto_API.Admin.Server
             }
         }
         [HttpGet(nameof(FindByGuid))]
-        public async Task<ResultOf<CategoriesModel>> FindByGuid(Guid Guid)
+        public async Task<ResultOf<CategoriesInfoModel>> FindByGuid(Guid Guid)
         {
             try
             {
 
                 using (var db = _DbContext.Connection())
                 {
-                    var res = await db.Set<EntityCategory>().Include(x => x.ProductCategories).ThenInclude(x => x.Product).Select(x => new CategoriesModel()
+                    var res = await db.Set<EntityCategory>().Include(x => x.ProductCategories).ThenInclude(x => x.Product).Select(x => new CategoriesInfoModel()
                     {
                         Guid = Guid,
                         Name = x.Name,
                         Description = x.Description,
-                        ProductNames = x.ProductCategories.Select(x => x.Product.Name).ToList(),
                     }).FirstOrDefaultAsync(x => x.Guid == Guid);
                     if (res != null)
                     {
@@ -77,29 +76,43 @@ namespace BlazorAuto_API.Admin.Server
             }
         }
         [HttpPost(nameof(GetData))]
-        public async Task<PagedResultsOf<CategoriesModel>> GetData([FromBody] DataRequestDto Request)
+        public async Task<PagedResultsOf<CategoriesInfoModel>> GetData([FromBody] DataRequestDto Request)
         {
             try
             {
-                var rstTemp = await _DbContext.GetData<EntityCategory>(Request, x => x.Include(x => x.ProductCategories).ThenInclude(x => x.Product));
-                var rst = PagedResultsOf<CategoriesModel>.Ok(
-                    rstTemp.Items.Select(x => new CategoriesModel
+                var rstTemp = await _DbContext.GetData<EntityCategory>(Request, x => x.Where(x=>!x.IsDeleted).Include(x => x.ProductCategories).ThenInclude(x => x.Product));
+                var rst = PagedResultsOf<CategoriesInfoModel>.Ok(
+                    rstTemp.Items.Select(x => new CategoriesInfoModel
                     {
                         Description = x.Description,
                         Guid = x.Guid,
                         Name = x.Name,
-                        ProductNames = x.ProductCategories.Select(pc => pc.Product.Name).ToList()
                     }), rstTemp.TotalCount);
                 return rst;
             }
             catch (Exception)
             {
-                return PagedResultsOf<CategoriesModel>.Error("An error occurred while fetching data.");
+                return PagedResultsOf<CategoriesInfoModel>.Error("An error occurred while fetching data.");
             }
 
 
 
         }
-
+        [HttpPost(nameof(Remove))]
+        public async Task<Result> Remove(Guid Guid)
+        {
+            using (var db = _DbContext.BeginTransaction())
+            {
+                var model = await db.Set<EntityCategory>().FirstOrDefaultAsync(x => x.Guid == Guid);
+                if (model == null)
+                {
+                    return "Không tìm thấy";
+                }
+                model.DeletedBy = "test";
+                model.DeletedAt = DateTime.Now;
+                db.Set<EntityCategory>().Update(model);
+                return true;
+            }
+        }
     }
 }

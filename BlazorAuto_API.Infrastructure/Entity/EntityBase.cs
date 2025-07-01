@@ -36,7 +36,7 @@ namespace BlazorAuto_API.Infrastructure
         public DateTime? DeletedAt { get; set; }
 
         [NotMapped]
-        public bool IsDeleted => DeletedAt != null;
+        public bool IsDeleted => !DeletedAt.HasValue;
     }
 
 

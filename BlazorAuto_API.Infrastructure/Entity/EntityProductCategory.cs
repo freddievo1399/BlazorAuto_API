@@ -12,12 +12,12 @@ namespace BlazorAuto_API.Infrastructure
     public class EntityProductCategory : EntityBase
     {
         [Required]
-        public int ProductId { get; set; }
+        public Guid ProductGuid { get; set; }
         [NotMapped]
         public EntityProduct Product { get; set; } = default!;
 
         [Required]
-        public int CategoryId { get; set; }
+        public Guid CategoryGuid { get; set; }
         [NotMapped]
         public EntityCategory Category { get; set; } = default!;
     }

@@ -33,7 +33,7 @@ namespace BlazorAuto_API.Infrastructure
             return _context;
         }
 
-        public async Task<PagedResultsOf<T>> GetData<T>(DataRequestDto DataManagerDto, Action<IQueryable<T>>? queryExtend = null) where T : EntityBase
+        public async Task<PagedResultsOf<T>> GetData<T>(DataRequestDto DataManagerDto, Func<IQueryable<T>, IQueryable<T>>? queryExtend = null) where T : EntityBase
         {
             using (var transaction = Connection())
             {
@@ -41,7 +41,7 @@ namespace BlazorAuto_API.Infrastructure
                 var query = transaction.Set<T>().AsQueryable();
                 if (queryExtend != null)
                 {
-                    queryExtend.Invoke(query);
+                    query = queryExtend.Invoke(query);
                 }
 
 
@@ -61,6 +61,7 @@ namespace BlazorAuto_API.Infrastructure
                 if (DataManagerRequest.Take > 0)
                     query = query.Take(DataManagerRequest.Take);
 
+                var abc = query.ToQueryString();
                 var result = await query.AsNoTracking().ToListAsync();
                 return PagedResultsOf<T>.Ok(result, count);
             }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace BlazorAuto_API.Abstract
 {
-    public interface IExcuteService<T>
+    public interface IExecuteService<T>
     {
-
+        public T GetService();
         public V Excute<V>(Func<T, V> func);
     }
 }

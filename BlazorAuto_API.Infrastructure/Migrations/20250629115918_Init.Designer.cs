@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorAuto_API.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250620095904_Init")]
+    [Migration("20250629115918_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -29,58 +29,48 @@ namespace BlazorAuto_API.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<Guid>("Guid")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -94,58 +84,47 @@ namespace BlazorAuto_API.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(500)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("Guid")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -159,140 +138,123 @@ namespace BlazorAuto_API.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("int");
+                    b.Property<Guid>("CategoryGuid")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<Guid>("Guid")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ProductId")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("int");
+                    b.Property<Guid>("ProductGuid")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryGuid");
 
                     b.HasIndex("Guid")
                         .IsUnique();
 
-                    b.HasIndex("ProductId", "CategoryId")
+                    b.HasIndex("ProductGuid", "CategoryGuid")
                         .IsUnique();
 
                     b.ToTable("Product_Category", (string)null);
                 });
 
-            modelBuilder.Entity("BlazorAuto_API.Infrastructure.ProductSpecification", b =>
+            modelBuilder.Entity("BlazorAuto_API.Infrastructure.EntityProductSpecification", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Description")
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("DicountPrice")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
 
                     b.Property<Guid>("Guid")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsEnable")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("ProductId")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("int");
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<Guid>("ProductGuid")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(200)");
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Guid")
                         .IsUnique();
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductGuid");
 
                     b.ToTable("Product_Specification", (string)null);
                 });
@@ -301,13 +263,15 @@ namespace BlazorAuto_API.Infrastructure.Migrations
                 {
                     b.HasOne("BlazorAuto_API.Infrastructure.EntityCategory", "Category")
                         .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("CategoryGuid")
+                        .HasPrincipalKey("Guid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BlazorAuto_API.Infrastructure.EntityProduct", "Product")
                         .WithMany("ProductCategories")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("ProductGuid")
+                        .HasPrincipalKey("Guid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -316,11 +280,12 @@ namespace BlazorAuto_API.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BlazorAuto_API.Infrastructure.ProductSpecification", b =>
+            modelBuilder.Entity("BlazorAuto_API.Infrastructure.EntityProductSpecification", b =>
                 {
                     b.HasOne("BlazorAuto_API.Infrastructure.EntityProduct", "Product")
                         .WithMany("Specifications")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("ProductGuid")
+                        .HasPrincipalKey("Guid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

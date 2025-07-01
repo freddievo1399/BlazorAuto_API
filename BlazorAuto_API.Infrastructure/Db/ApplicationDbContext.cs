@@ -25,52 +25,71 @@ namespace BlazorAuto_API.Infrastructure
             foreach (var modelType in modelBuilder.Model.GetEntityTypes())
             {
                 var nameTable = modelType.FindAnnotation("Relational:TableName");
+                var entity = modelBuilder.Entity(modelType.Name);
                 if (nameTable != null)
                 {
-                    var entity = modelBuilder.Entity(modelType.Name);
                     entity.ToTable(nameTable.Value?.ToString());
-                    entity.HasIndex("Guid").IsUnique();
+                }
+                entity.HasIndex("Guid").IsUnique();
 
-                    var props = entity.Metadata.GetDeclaredProperties();
-                    foreach (IMutableProperty prop in props)
+                var props = entity.Metadata.GetDeclaredProperties();
+                foreach (IMutableProperty prop in props)
+                {
+                    var propEntity = entity.Property(prop.Name);
+                    var clrType = prop.ClrType;
+                    if (clrType == typeof(string))
                     {
                         var MaxLength = prop.FindAnnotation<PrecisionAttribute>();
                         if (MaxLength != null)
                         {
-                            entity.Property(prop.Name).HasMaxLength(100);
+                            propEntity.HasMaxLength(100);
+                            continue;
                         }
 
-                        if (prop.ClrType == typeof(decimal) || prop.ClrType == typeof(decimal?))
-                        {
-                            var Precision = prop.FindAnnotation<PrecisionAttribute>();
-
-                            if (Precision == null)
-                            {
-                                entity.Property(prop.Name).HasPrecision(18, 6);
-                            }
-                        }
                         var VarCharAnnotion = prop.FindAnnotation<NvarcharAttribute>();
 
                         if (VarCharAnnotion != null)
                         {
-                            entity.Property(prop.Name).IsUnicode(true);
+                            propEntity.IsUnicode(false);
                         }
                         else
                         {
-                            entity.Property(prop.Name).IsUnicode(false);
+                            propEntity.IsUnicode(true);
 
                         }
-                        var JsonDataAttribute = prop.FindAnnotation<JsonDataAttribute>();
-
-                        if (JsonDataAttribute != null)
-                        {
-                            entity.Property(prop.Name).HasColumnType("nvarchar(max)").HasJsonPropertyName("JsData" + prop.Name);
-                        }
+                        continue;
                     }
+                    if (clrType == typeof(decimal) || clrType == typeof(decimal?))
+                    {
+                        var Precision = prop.FindAnnotation<PrecisionAttribute>();
 
+                        if (Precision == null)
+                        {
+                            propEntity.HasPrecision(18, 6);
+                        }
+                        continue;
+                    }
+                    var JsonDataAttribute = prop.FindAnnotation<JsonDataAttribute>();
+                    if (JsonDataAttribute != null)
+                    {
+                        propEntity.HasColumnType("nvarchar(max)").HasJsonPropertyName("JsData" + prop.Name);
+                        continue;
+                    }
+                    if (clrType.IsClass)
+                    {
+                        propEntity.HasColumnType("nvarchar(max)").HasJsonPropertyName("JsData" + prop.Name);
+                    }
                 }
+
             }
             base.OnModelCreating(modelBuilder);
+        }
+        public void CommitTransaction()
+        {
+            if (Database.CurrentTransaction != null)
+            {
+                Database.CurrentTransaction.Commit();
+            }
         }
     }
 }

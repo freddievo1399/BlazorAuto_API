@@ -1,17 +1,19 @@
 ﻿@page "/admin/product"
-
-@inject IExcuteService<ICategoriesService> CategoriesService;
-<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
+@inject NavigationManager NavigationManager
+@inject SwalService Swal
+@inject IExecuteService<IProductManagerService> ProductService;
+<PageHeaderContent>
+	<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
+</PageHeaderContent>
 <MudDialog @ref=DialogAddCategori Class="container-md">
 	<TitleContent>
 		<MudText>Tạo Danh mục hàng</MudText>
 	</TitleContent>
 	<DialogContent>
-		<EditForm id="formsubmit" Model=categoriesCreateModel OnValidSubmit="OnValidSubmit">
+		<EditForm id="formsubmit" Model=productCreateModel OnValidSubmit="OnValidSubmit">
 			<DataAnnotationsValidator />
-			@* <ValidationSummary   /> *@
-			<MudTextField T="string" @bind-Text=categoriesCreateModel.Name Label="Tên" InputMode="InputMode.text"></MudTextField>
-			<MudTextField T="string" @bind-Text=categoriesCreateModel.Description Label="Mô tả"></MudTextField>
+			<MudTextField T="string" @bind-Text=productCreateModel.Name Label="Tên"></MudTextField>
+			<MudTextField T="string" @bind-Text=productCreateModel.Description Label="Mô tả"></MudTextField>
 		</EditForm>
 	</DialogContent>
 	<DialogActions>
@@ -20,54 +22,52 @@
 	</DialogActions>
 </MudDialog>
 
-<SfGrid @ref=grid TValue="CategoriesModel">
+<SfGrid @ref=grid TValue="ProductInfoModel">
 	<SfDataManager Adaptor="Adaptors.CustomAdaptor">
 		<CustomAdaptorGridBlazor GetDataMethod="GetData"></CustomAdaptorGridBlazor>
 	</SfDataManager>
 	<GridColumns>
-		<GridColumn Field="@(nameof(CategoriesModel.Name))"></GridColumn>
-		<GridColumn Field="@(nameof(CategoriesModel.Description))"></GridColumn>
-		<GridColumn Field="@(nameof(CategoriesModel.ProductNames))">
+		<GridColumn Field="@(nameof(ProductInfoModel.Name))"></GridColumn>
+		<GridColumn Field="@(nameof(ProductInfoModel.Description))"></GridColumn>
+		<GridColumn HeaderText="Func" TextAlign="TextAlign.Right" Width="100">
 			<Template>
 				@{
-					var employee = (context as CategoriesModel);
-					@if (employee.ProductNames == null)
-					{
-
-						<div>
-							@string.Join(",", employee?.ProductNames ?? [])
-						</div>
-					}
-					else
-					{
-						<div>
-
-							""
-						</div>
-					}
+					var product = (context as ProductInfoModel);
+					<SfDropDownButton IconCss="e-message" CssClass="DropdownFunction">
+						<DropDownMenuItems>
+							<DropDownButtonEvents ItemSelected="Grid_SelectedTask"></DropDownButtonEvents>
+							<DropDownMenuItem Id="@($"Grid_Edit|{product!.Guid}")" Text="Chỉnh sửa"></DropDownMenuItem>
+							<DropDownMenuItem Id="@($"Grid_Delete|{product!.Guid}")" Text="Xóa"></DropDownMenuItem>
+						</DropDownMenuItems>
+					</SfDropDownButton>
 				}
 			</Template>
 		</GridColumn>
+
 	</GridColumns>
 </SfGrid>
 @code {
-	CategoriesCreateModel categoriesCreateModel = null;
+	RenderFragment PageHeaderContent => @<PageHeader PageTitle="Quản lý Danh mục"
+			RefeshEvent="@(() => grid.Refresh())"
+			AddEvent="OpenDialogAddCategori" />;
+
+	ProductCreateModel productCreateModel = null;
 	MudDialog DialogAddCategori;
-	private SfGrid<CategoriesModel> grid;
-	private async Task<PagedResultsOf<CategoriesModel>> GetData(DataManagerRequest request)
+	private SfGrid<ProductInfoModel> grid;
+	private async Task<PagedResultsOf<ProductInfoModel>> GetData(DataManagerRequest request)
 	{
-		var rsp = await CategoriesService.Excute(x => x.GetData(request));
+		var rsp = await ProductService.Excute(x => x.GetData(request));
 		return rsp;
 	}
 	private async Task OpenDialogAddCategori()
 	{
-		categoriesCreateModel = new();
+		productCreateModel = new();
 		await DialogAddCategori.ShowAsync();
 	}
 	private async Task OnValidSubmit()
 	{
 		await Swal.Loading("Vui lòng đợi");
-		var rsp = await CategoriesService.Excute(x => x.Add(categoriesCreateModel));
+		var rsp = await ProductService.Excute(x => x.Add(productCreateModel));
 		if (rsp.Success)
 		{
 			await Swal.Close();
@@ -77,6 +77,43 @@
 		else
 		{
 			await Swal.Warning(rsp.Message);
+		}
+	}
+	private async void Grid_SelectedTask(MenuEventArgs e)
+	{
+		var arrParameter = e.Item.Id.Split("|");
+		string cmd = arrParameter[0];
+		Guid guid = Guid.Parse(arrParameter[1]);
+
+		switch (cmd)
+		{
+			case "Grid_Edit":
+				Grid_Edit(guid);
+				break;
+			case "Grid_Delete":
+				await Grid_Delete(guid);
+				break;
+		}
+	}
+	private void Grid_Edit(Guid guid)
+	{
+		NavigationManager.NavigateTo($"/admin/product/{guid}");
+	}
+	private async Task Grid_Delete(Guid guid)
+	{
+		var comfirm = await Swal.Confirm("Chấp nhận xóa");
+		if (comfirm == SwalResult.Confirmed)
+		{
+
+			var rsp = await ProductService.Excute(x => x.Remove(guid));
+			if (rsp.Success)
+			{
+				await grid.Refresh();
+			}
+			else
+			{
+				await Swal.Warning(rsp.Message);
+			}
 		}
 	}
 }

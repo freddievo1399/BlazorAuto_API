@@ -1,0 +1,53 @@
+﻿@page "/admin/product/{Guid:guid}"
+@inject NavigationManager NavigationManager
+@inject SwalService Swal
+@inject IExecuteService<IProductManagerService> ProductService;
+<PageHeader PageTitle="Cấu hình sản phẩm"></PageHeader>
+@if (!IsLoaded)
+{
+
+}
+else if (ProductModel == null)
+{
+	<div>Không tìm thấy</div>
+}
+else
+{
+	<EditForm id="formsubmit" Model=ProductModel OnValidSubmit="OnValidSubmit">
+		<DataAnnotationsValidator />
+		<MudTextField T="string" @bind-Text=ProductModel.Name Label="Tên" InputMode="InputMode.text" Disabled></MudTextField>
+		<MudTextField T="string" @bind-Text=ProductModel.Description Label="Mô tả" Disabled></MudTextField>
+		<MudButton Color="Color.Primary" ButtonType="MudBlazor.ButtonType.Submit" form="formsubmit">OK</MudButton>
+	</EditForm>
+
+}
+
+@code {
+	[Parameter]
+	public Guid Guid { get; set; }
+	public ProductInfoModel? ProductModel { get; set; }
+	bool IsLoaded = false;
+	override protected async Task OnInitializedAsync()
+	{
+		var rlt = await ProductService.Excute(x => x.FindByGuid(Guid));
+		if (rlt.Success)
+		{
+			ProductModel = rlt.Item;
+			IsLoaded = true;
+		}
+	}
+	private async Task OnValidSubmit()
+	{
+		// await Swal.Loading("Vui lòng đợi");
+		// var rsp = await ProductService.Excute(x => x.Add(ProductModel));
+		// if (rsp.Success)
+		// {
+		// 	await Swal.Close();
+		// }
+		// else
+		// {
+		// 	await Swal.Warning(rsp.Message);
+		// }
+	}
+}
+

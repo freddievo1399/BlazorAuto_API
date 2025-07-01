@@ -8,17 +8,23 @@ using System.Threading.Tasks;
 
 namespace BlazorAuto_API.Infrastructure;
 [Table("Product_Specification")]
-public class ProductSpecification : EntityBase
+public class EntityProductSpecification : EntityBase
 {
-    public int ProductId { get; set; }
+    [Required]
+    public Guid ProductGuid { get; set; }
+
     public EntityProduct Product { get; set; } = default!;
 
     [Required]
     [MaxLength(100)]
     public string Name { get; set; } = default!;
 
-    [Required]
-    [MaxLength(200)]
-    public string Value { get; set; } = default!;
+    public decimal? Price { get; set; }
+
+    public decimal? DicountPrice { get; set; }
+
+    public string? Description { get; set; }
+
+    public bool IsEnable { get; set; }
 }
 

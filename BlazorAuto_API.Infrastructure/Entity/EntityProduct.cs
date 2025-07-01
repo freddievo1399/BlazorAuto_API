@@ -6,26 +6,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlazorAuto_API.Infrastructure
+namespace BlazorAuto_API.Infrastructure;
+
+[Table("Product")]
+public class EntityProduct : EntityBase
 {
-    [Table("Product")]
-    public class EntityProduct : EntityBase
+    [Required]
+    [MaxLength(100)]
+    public string Name { get; set; } = default!;
+
+    public string? Description { get; set; }
+
+    public string? RichDescription { get; set; }
+
+    public ICollection<EntityProductSpecification> Specifications { get; set; }
+
+    public ICollection<EntityProductCategory> ProductCategories { get; set; }
+
+    [NotMapped]
+    public ICollection<EntityCategory> Categories
     {
-        [Required]
-        [MaxLength(100)]
-        public string Name { get; set; } = default!;
-
-        [MaxLength(500)]
-        public string? Description { get; set; }
-        public ICollection<ProductSpecification> Specifications { get; set; }
-
-        public ICollection<EntityProductCategory> ProductCategories { get; set; }
-
-        [NotMapped]
-        public ICollection<EntityCategory> Categories
-        {
-            get => ProductCategories.Select(x => x.Category).ToList();
-        }
+        get => ProductCategories?.Select(x => x.Category).ToList() ?? new();
     }
-
 }

@@ -23,6 +23,6 @@ public class EntityCategory : EntityBase
     [NotMapped]
     public ICollection<EntityProduct> Product
     {
-        get => ProductCategories.Select(x => x.Product).ToList();
+        get => ProductCategories.Select(x => x.Product).ToList() ?? new();
     }
 }

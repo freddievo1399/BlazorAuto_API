@@ -7,27 +7,28 @@ public class EntityRegister : IEntityRegister
     public void RegisterEntities(ModelBuilder modelbuilder)
     {
         modelbuilder.Entity<EntityProductCategory>()
-           .HasIndex(c => new { c.ProductId, c.CategoryId }).IsUnique();
+           .HasIndex(c => new { c.ProductGuid, c.CategoryGuid }).IsUnique();
 
         modelbuilder.Entity<EntityCategory>()
             .HasMany(c => c.ProductCategories)
             .WithOne(pc => pc.Category)
-            .HasForeignKey(pc => pc.CategoryId)
-            .HasPrincipalKey(x=>x.Id);
+            .HasForeignKey(pc => pc.CategoryGuid)
+            .HasPrincipalKey(x=>x.Guid);
 
         modelbuilder.Entity<EntityProduct>()
             .HasMany(c => c.ProductCategories)
             .WithOne(pc => pc.Product)
-            .HasForeignKey(pc => pc.ProductId)
-            .HasPrincipalKey(x=>x.Id);
+            .HasForeignKey(pc => pc.ProductGuid)
+            .HasPrincipalKey(x=>x.Guid);
 
 
 
 
-        modelbuilder.Entity<ProductSpecification>()
+        modelbuilder.Entity<EntityProductSpecification>()
             .HasOne(c => c.Product)
             .WithMany(pc => pc.Specifications)
-            .HasForeignKey(x=>x.ProductId);
+            .HasForeignKey(x=>x.ProductGuid)
+            .HasPrincipalKey(x=>x.Guid);
 
     }
 }

@@ -1,4 +1,5 @@
 using BlazorAuto_API.Abstract;
+using BlazorAuto_API.BaseUIBlazor;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
 using MudBlazor.Services;
@@ -10,7 +11,7 @@ builder.Services.AddSyncfusionBlazor();
 SyncfusionLicense.Register();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<LazyAssemblyLoader>();
-builder.Services.AddScoped(typeof(IExcuteService<>), typeof(ExcuteService<>));
+builder.Services.AddScoped(typeof(IExecuteService<>), typeof(ExecuteService<>));
 builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
 builder.Services.AddScoped<SwalService>();
 builder.Services.AddMudServices();

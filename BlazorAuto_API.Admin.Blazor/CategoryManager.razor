@@ -1,7 +1,8 @@
 ﻿@page "/admin/categorie"
-
-@inject IExcuteService<ICategoriesService> CategoriesService;
-<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
+@inject IExecuteService<ICategoriesManagerService> CategoriesService;
+<PageHeaderContent>
+	<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
+</PageHeaderContent>
 <MudDialog @ref=DialogAddCategori Class="container-md">
 	<TitleContent>
 		<MudText>Tạo Danh mục hàng</MudText>
@@ -20,43 +21,24 @@
 	</DialogActions>
 </MudDialog>
 
-<SfGrid @ref=grid TValue="CategoriesModel">
+<SfGrid @ref=grid TValue="CategoriesInfoModel">
 	<SfDataManager Adaptor="Adaptors.CustomAdaptor">
 		<CustomAdaptorGridBlazor GetDataMethod="GetData"></CustomAdaptorGridBlazor>
 	</SfDataManager>
 	<GridColumns>
-		<GridColumn Field="@(nameof(CategoriesModel.Name))"></GridColumn>
-		<GridColumn Field="@(nameof(CategoriesModel.Description))"></GridColumn>
-		<GridColumn Field="@(nameof(CategoriesModel.ProductNames))">
-			<Template>
-				@{
-					var employee = (context as CategoriesModel);
-					@if (employee.ProductNames == null)
-					{
-
-						<div>
-							@string.Join(",", employee?.ProductNames ?? [])
-						</div>
-					}
-					else
-					{
-						<div>
-
-							""
-						</div>
-					}
-				}
-			</Template>
-		</GridColumn>
+		<GridColumn Field="@(nameof(CategoriesInfoModel.Name))"></GridColumn>
+		<GridColumn Field="@(nameof(CategoriesInfoModel.Description))"></GridColumn>
 	</GridColumns>
 </SfGrid>
 @code {
-	CategoriesCreateModel categoriesCreateModel =null;
+	CategoriesCreateModel categoriesCreateModel = null;
 	MudDialog DialogAddCategori;
-	private SfGrid<CategoriesModel> grid;
-	private async Task<PagedResultsOf<CategoriesModel>> GetData(DataManagerRequest request)
+	ICategoriesManagerService service => CategoriesService.GetService();
+	private SfGrid<CategoriesInfoModel> grid;
+
+	private async Task<PagedResultsOf<CategoriesInfoModel>> GetData(DataManagerRequest request)
 	{
-		var rsp = await CategoriesService.Excute(x => x.GetData(request));
+		var rsp = await service.GetData(request);
 		return rsp;
 	}
 	private async Task OpenDialogAddCategori()
@@ -67,7 +49,7 @@
 	private async Task OnValidSubmit()
 	{
 		await Swal.Loading("Vui lòng đợi");
-		var rsp = await CategoriesService.Excute(x => x.Add(categoriesCreateModel));
+		var rsp = await service.Add(categoriesCreateModel);
 		if (rsp.Success)
 		{
 			await Swal.Close();

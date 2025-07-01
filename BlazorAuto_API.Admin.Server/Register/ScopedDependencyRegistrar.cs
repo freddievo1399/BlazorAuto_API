@@ -14,8 +14,9 @@ namespace BlazorAuto_API.Admin.Server
     {
         public void RegisterServices(IServiceCollection services)
         {
-            services.AddScoped<ICategoriesService, CategoriesController>();
-
+            services.AddScoped<ICategoriesManagerService, CategoriesManagerController>();
+            services.AddScoped<IProductManagerService, ProductManagerController>();
+            services.AddScoped<IProductDetailService, ProductDetailController>();
         }
     }
 }

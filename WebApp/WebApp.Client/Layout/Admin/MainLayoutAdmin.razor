@@ -1,22 +1,24 @@
-﻿@using MudBlazor
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
+@using MudBlazor
 
-<div class="page">
-	<div class="sidebar">
-		<NavMenu />
-	</div>
-	Adminnha
-	<main>
-		<div class="top-row px-4">
-			<a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+<div class="container-fluid" onclick="@ToggleDisable">
+	<header class="header">
+		<div class="button-toggle">
+			<MudIconButton Icon="@Icons.Material.Filled.Menu" Size="Size.Small" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
 		</div>
+		@_headerContentManager.Content
+	</header>
 
-		<article class="content px-4">
-			@Body
+	<SideBar @bind-Open=_drawerOpen></SideBar>
+	<main class="col-auto">
+		<article class="row">
+			<CascadingValue Value="_headerContentManager">
+				@Body
+			</CascadingValue>
 			<SwalHost />
-				<MudThemeProvider />
-	<MudPopoverProvider />
-	<MudDialogProvider />
+			<MudThemeProvider />
+			<MudPopoverProvider />
+			<MudDialogProvider />
 		</article>
 	</main>
 </div>
@@ -26,3 +28,28 @@
 	<a href="" class="reload">Reload</a>
 	<a class="dismiss">🗙</a>
 </div>
+
+@code {
+	bool _drawerOpen = false;
+	private PageHeaderContentManager _headerContentManager = new();
+	protected override void OnInitialized()
+	{
+		_headerContentManager.OnChanged += StateHasChanged;
+	}
+
+	public void Dispose()
+	{
+		_headerContentManager.OnChanged -= StateHasChanged;
+	}
+	void DrawerToggle()
+	{
+		_drawerOpen = !_drawerOpen;
+	}
+	void ToggleDisable()
+	{
+		if (_drawerOpen)
+		{
+			_drawerOpen = false;
+		}
+	}
+}
