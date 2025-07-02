@@ -1,6 +1,6 @@
 ﻿@using Syncfusion.Blazor.RichTextEditor
 
-<SfRichTextEditor EnableAutoUrl @ref="sfRichTextEditor" onmouseup="Onclick" Readonly="IsViewer">
+<SfRichTextEditor EnableAutoUrl @bind-Value=Value @ref="sfRichTextEditor" onmouseup="Onclick" Readonly="IsViewer">
     <RichTextEditorToolbarSettings Type="ToolbarType.MultiRow" Items="Items" Enable="!IsViewer" />
     <RichTextEditorImageSettings Display="ImageDisplay.Break" ResizeByPercent  >
         
@@ -14,6 +14,10 @@
     public bool IsViewer { get; set; } = false;
 
     SfRichTextEditor sfRichTextEditor;
+    [Parameter]
+    public string Value { get; set; }
+    
+    
     private List<ToolbarItemModel> Items = new List<ToolbarItemModel>()
 {
     // --- Nhóm: Định dạng văn bản cơ bản ---

@@ -80,7 +80,7 @@ namespace BlazorAuto_API.Admin.Server
         {
             try
             {
-                var rstTemp = await _DbContext.GetData<EntityCategory>(Request, x => x.Where(x=>!x.IsDeleted).Include(x => x.ProductCategories).ThenInclude(x => x.Product));
+                var rstTemp = await _DbContext.GetData<EntityCategory>(Request, x => x.Where(x => !x.IsDeleted).Include(x => x.ProductCategories).ThenInclude(x => x.Product));
                 var rst = PagedResultsOf<CategoriesInfoModel>.Ok(
                     rstTemp.Items.Select(x => new CategoriesInfoModel
                     {
@@ -101,17 +101,26 @@ namespace BlazorAuto_API.Admin.Server
         [HttpPost(nameof(Remove))]
         public async Task<Result> Remove(Guid Guid)
         {
-            using (var db = _DbContext.BeginTransaction())
+            try
             {
-                var model = await db.Set<EntityCategory>().FirstOrDefaultAsync(x => x.Guid == Guid);
-                if (model == null)
+
+                using (var db = _DbContext.Connection())
                 {
-                    return "Không tìm thấy";
+                    var model = await db.Set<EntityCategory>().FirstOrDefaultAsync(x => x.Guid == Guid);
+                    if (model == null)
+                    {
+                        return "Không tìm thấy";
+                    }
+                    model.DeletedBy = "test";
+                    model.DeletedAt = DateTime.Now;
+                    db.Set<EntityCategory>().Update(model);
+                    await db.SaveChangesAsync();
+                    return true;
                 }
-                model.DeletedBy = "test";
-                model.DeletedAt = DateTime.Now;
-                db.Set<EntityCategory>().Update(model);
-                return true;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
         }
     }

@@ -10,7 +10,7 @@ namespace BlazorAuto_API.Infrastructure
 {
     public interface IDbContext
     {
-        public ApplicationDbContext BeginTransaction();
+        public Task<ApplicationDbContext> BeginTransactionAsync();
         public ApplicationDbContext Connection();
 
         public Task<PagedResultsOf<T>> GetData<T>(DataRequestDto DataManagerDto, Func<IQueryable<T>, IQueryable<T>>? queryExtend = null) where T : EntityBase;

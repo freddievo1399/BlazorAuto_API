@@ -84,11 +84,11 @@ namespace BlazorAuto_API.Infrastructure
             }
             base.OnModelCreating(modelBuilder);
         }
-        public void CommitTransaction()
+        public async Task CommitAsync()
         {
             if (Database.CurrentTransaction != null)
             {
-                Database.CurrentTransaction.Commit();
+                await Database.CurrentTransaction.CommitAsync();
             }
         }
     }

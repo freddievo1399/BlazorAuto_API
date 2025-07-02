@@ -7,7 +7,6 @@ using BlazorAuto_API.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using MudBlazor.Services;
 using Syncfusion.Blazor;
 using WebApp;
 using WebApp.Abstract;
@@ -21,7 +20,6 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
-builder.Services.AddMudServices();
 builder.Services.AddHttpClient();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()

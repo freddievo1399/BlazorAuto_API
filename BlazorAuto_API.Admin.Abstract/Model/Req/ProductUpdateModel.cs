@@ -16,5 +16,6 @@ namespace BlazorAuto_API.Admin.Abstract
         public string RichDescription { get; set; }
 
         public ICollection<Guid>? CategoryGuids { get; set; }
+        public ICollection<ProductSpecificationModel>? ProductSpecifications { get; set; }
     }
 }

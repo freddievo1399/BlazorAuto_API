@@ -1,16 +1,15 @@
 ﻿<div class="col-auto mr-auto">@PageTitle</div>
 <div class="col-auto">
-	<MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+	<SfButtonGroup CssClass="e-small">
 		@if (AddEvent.HasDelegate)
 		{
-			<MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddEvent" />
+			<ButtonGroupButton IconCss="bi bi-plus-lg" CssClass=" e-primary" @onclick=AddEvent></ButtonGroupButton>
 		}
 		@if (RefeshEvent.HasDelegate)
 		{
-			<MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="RefeshEvent" />
+			<ButtonGroupButton IconCss="bi bi-arrow-clockwise" CssClass=" e-info" @onclick=RefeshEvent></ButtonGroupButton>
 		}
-		@Body
-	</MudButtonGroup>
+	</SfButtonGroup>
 </div>
 
 @code {

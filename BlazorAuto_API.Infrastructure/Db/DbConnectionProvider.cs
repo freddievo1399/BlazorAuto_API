@@ -20,10 +20,10 @@ namespace BlazorAuto_API.Infrastructure
             _factory = factory;
         }
 
-        public ApplicationDbContext BeginTransaction()
+        public async Task<ApplicationDbContext> BeginTransactionAsync()
         {
             var _context = _factory.CreateDbContext();
-            _context.Database.BeginTransaction();
+            await _context.Database.BeginTransactionAsync();
             return _context;
         }
 

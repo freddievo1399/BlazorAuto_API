@@ -3,23 +3,22 @@
 <PageHeaderContent>
 	<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
 </PageHeaderContent>
-<MudDialog @ref=DialogAddCategori Class="container-md">
-	<TitleContent>
-		<MudText>Tạo Danh mục hàng</MudText>
-	</TitleContent>
-	<DialogContent>
-		<EditForm id="formsubmit" Model=categoriesCreateModel OnValidSubmit="OnValidSubmit">
-			<DataAnnotationsValidator />
-			@* <ValidationSummary   /> *@
-			<MudTextField T="string" @bind-Text=categoriesCreateModel.Name Label="Tên" InputMode="InputMode.text"></MudTextField>
-			<MudTextField T="string" @bind-Text=categoriesCreateModel.Description Label="Mô tả"></MudTextField>
-		</EditForm>
-	</DialogContent>
-	<DialogActions>
-		<MudButton OnClick="@(()=>DialogAddCategori.CloseAsync())">Cancel</MudButton>
-		<MudButton Color="Color.Primary" ButtonType="MudBlazor.ButtonType.Submit" form="formsubmit">OK</MudButton>
-	</DialogActions>
-</MudDialog>
+<SfDialog @ref=DialogAddCategori Width="250px" Visible=false AllowDragging="true" ShowCloseIcon="true">
+	<DialogTemplates>
+		<Header> Tạo Danh mục hàng </Header>
+		<Content>
+			<EditForm id="formsubmit" Model=categoriesCreateModel OnValidSubmit="OnValidSubmit">
+				<DataAnnotationsValidator />
+				<SfTextBox @bind-Value="categoriesCreateModel.Name" Placeholder="Tên" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+				<SfTextBox @bind-Value="categoriesCreateModel.Description" Placeholder="Mô tả" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+			</EditForm>
+		</Content>
+	</DialogTemplates>
+	<DialogButtons>
+		<SfButton HtmlAttributes="@(new Dictionary<string, object> { { "type", "submit" },{"form","formsubmit"} })">OK</SfButton>
+		<DialogButton Content="Cancel" OnClick=@(()=>DialogAddCategori.HideAsync()) />
+	</DialogButtons>
+</SfDialog>
 
 <SfGrid @ref=grid TValue="CategoriesInfoModel">
 	<SfDataManager Adaptor="Adaptors.CustomAdaptor">
@@ -32,7 +31,7 @@
 </SfGrid>
 @code {
 	CategoriesCreateModel categoriesCreateModel = null;
-	MudDialog DialogAddCategori;
+	SfDialog DialogAddCategori;
 	ICategoriesManagerService service => CategoriesService.GetService();
 	private SfGrid<CategoriesInfoModel> grid;
 
@@ -53,7 +52,7 @@
 		if (rsp.Success)
 		{
 			await Swal.Close();
-			await DialogAddCategori.CloseAsync();
+			await DialogAddCategori.HideAsync();
 			await grid.Refresh();
 		}
 		else

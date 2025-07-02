@@ -83,7 +83,7 @@ public class ProductDetailController : ControllerBase, IProductDetailService
     {
         try
         {
-            using (var db = _DbContext.BeginTransaction())
+            using (var db = await _DbContext.BeginTransactionAsync())
             {
                 var product = await db.Set<EntityProduct>()
                     .Include(x => x.ProductCategories)
@@ -94,22 +94,21 @@ public class ProductDetailController : ControllerBase, IProductDetailService
                 product.Name = Request.Name;
                 product.Description = Request.Description;
                 product.UpdatedAt = DateTime.Now;
-                foreach (var productCategorieRemove in product.ProductCategories.Where(x => Request.CategoryGuids.Contains(x.CategoryGuid)))
+
+                var currentCategoryGuids = product.ProductCategories.Select(pc => pc.CategoryGuid).ToHashSet();
+                var requestCategoryGuids = Request.CategoryGuids.ToHashSet();
+
+                db.RemoveRange(product.ProductCategories.Where(x => !requestCategoryGuids.Contains(x.CategoryGuid)));
+                await db.AddRangeAsync(requestCategoryGuids.Except(currentCategoryGuids).Select(x => new EntityProductCategory
                 {
-                    db.Remove(productCategorieRemove);
-                }
-                foreach (var GuidCategory in Request.CategoryGuids.Where(x => !product.ProductCategories.Any(proc => proc.Guid == x)))
-                {
-                    var productCategorie = new EntityProductCategory()
-                    {
-                        ProductGuid = product.Guid,
-                        CategoryGuid = GuidCategory
-                    };
-                    db.Add(productCategorie);
-                }
+                    ProductGuid = product.Guid,
+                    CategoryGuid = x
+                }));
+
+
                 db.Update(product);
-                db.CommitTransaction();
-                db.SaveChanges();
+                await db.CommitAsync();
+                await db.SaveChangesAsync();
             }
             return true;
         }

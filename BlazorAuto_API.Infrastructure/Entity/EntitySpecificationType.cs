@@ -19,7 +19,7 @@ public class EntityProductSpecification : EntityBase
     [MaxLength(100)]
     public string Name { get; set; } = default!;
 
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
 
     public decimal? DicountPrice { get; set; }
 

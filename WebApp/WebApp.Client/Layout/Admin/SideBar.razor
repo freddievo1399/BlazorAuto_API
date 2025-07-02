@@ -1,9 +1,8 @@
-﻿@using MudBlazor
-@if (Open)
+﻿@if (Open)
 {
-	<nav class="sidebar col-auto">
+	<nav class="sidebar col-auto" @onclick:stopPropagation="true">
 
-		<MudText Typo="Typo.h6" Class="px-4">Admin</MudText>
+		<h3 class="px-4">Admin</h3>
 		<div class="nav-item px-3">
 			<NavLink Match="NavLinkMatch.Prefix" href="/admin/categorie">Categorie</NavLink>
 		</div>

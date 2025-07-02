@@ -16,7 +16,7 @@ namespace BlazorAuto_API.Admin.Server;
 
 [ApiController]
 [Route("/api/admin/[controller]")]
-[ApiExplorerSettings(GroupName ="Admin")]
+[ApiExplorerSettings(GroupName = "Admin")]
 public class ProductManagerController : ControllerBase, IProductManagerService
 {
     IDbContext _DbContext;
@@ -39,7 +39,7 @@ public class ProductManagerController : ControllerBase, IProductManagerService
                     CreatedBy = "test"
                 };
                 await db.Set<EntityProduct>().AddAsync(abc);
-                var i = await db.SaveChangesAsync();
+                await db.SaveChangesAsync();
 
             }
             return true;
@@ -102,7 +102,7 @@ public class ProductManagerController : ControllerBase, IProductManagerService
     [HttpPost(nameof(Remove))]
     public async Task<Result> Remove(Guid Guid)
     {
-        using (var db = _DbContext.BeginTransaction())
+        using (var db = _DbContext.Connection())
         {
             var model = await db.Set<EntityProduct>().FirstOrDefaultAsync(x => x.Guid == Guid);
             if (model == null)
@@ -112,7 +112,6 @@ public class ProductManagerController : ControllerBase, IProductManagerService
             model.DeletedBy = "test";
             model.DeletedAt = DateTime.Now;
             db.Set<EntityProduct>().Update(model);
-            db.CommitTransaction();
             await db.SaveChangesAsync();
             return true;
         }
