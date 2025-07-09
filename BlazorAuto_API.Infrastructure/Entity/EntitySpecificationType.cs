@@ -26,5 +26,38 @@ public class EntityProductSpecification : EntityBase
     public string? Description { get; set; }
 
     public bool IsEnable { get; set; }
+    public bool Equal(EntityProductSpecification obj)
+    {
+        if (! (obj is EntityProductSpecification))
+        {
+            return false;
+        }
+        var value = obj as EntityProductSpecification;
+        if (ProductGuid!= value.ProductGuid)
+        {
+            return false;
+        }
+        if (Name != value.Name)
+        {
+            return false;
+        }
+        if (Price != value.Price)
+        {
+            return false;
+        }
+        if (DicountPrice != value.DicountPrice)
+        {
+            return false;
+        }
+        if (Description != value.Description)
+        {
+            return false;
+        }
+        if (IsEnable != value.IsEnable)
+        {
+            return false;
+        }
+        return true;
+    }
 }
 

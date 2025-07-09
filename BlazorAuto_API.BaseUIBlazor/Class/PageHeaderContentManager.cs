@@ -10,12 +10,10 @@ namespace BlazorAuto_API.BaseUIBlazor
     public class PageHeaderContentManager
     {
         public RenderFragment Content { get; private set; }
-        public event Action? OnChanged;
 
         public void Set(RenderFragment content)
         {
             Content = content;
-            OnChanged?.Invoke();
         }
     }
 

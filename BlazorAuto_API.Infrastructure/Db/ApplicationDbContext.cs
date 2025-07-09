@@ -69,12 +69,6 @@ namespace BlazorAuto_API.Infrastructure
                         }
                         continue;
                     }
-                    var JsonDataAttribute = prop.FindAnnotation<JsonDataAttribute>();
-                    if (JsonDataAttribute != null)
-                    {
-                        propEntity.HasColumnType("nvarchar(max)").HasJsonPropertyName("JsData" + prop.Name);
-                        continue;
-                    }
                     if (clrType.IsClass)
                     {
                         propEntity.HasColumnType("nvarchar(max)").HasJsonPropertyName("JsData" + prop.Name);

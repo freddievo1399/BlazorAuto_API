@@ -16,11 +16,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSyncfusionBlazor();
 SyncfusionLicense.Register();
 // Add services to the container.
-builder.Services.Configure<ApiBehaviorOptions>(options =>
+builder.Services.AddHttpContextAccessor();
+
+
+builder.Services.AddScoped<HttpClient>(sp =>
 {
-    options.SuppressModelStateInvalidFilter = true;
+    var accessor = sp.GetRequiredService<IHttpContextAccessor>();
+    var request = accessor.HttpContext?.Request;
+
+    var baseUri = new Uri($"{request?.Scheme}://{request?.Host}/");
+    return new HttpClient { BaseAddress = baseUri };
 });
-builder.Services.AddHttpClient();
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
@@ -55,10 +62,7 @@ builder.Services.AddSwaggerGen(options =>
         return apiDesc.GroupName == groupName;
     });
 });
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<ValidateModelAttribute>();
-});
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 

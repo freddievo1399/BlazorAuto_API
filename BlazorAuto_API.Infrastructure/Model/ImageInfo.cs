@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace BlazorAuto_API.Infrastructure
 {
-    public class NvarcharAttribute : Attribute
+    public class ImageInfo
     {
-    }
-    public class NonDuplicatedAttribute : Attribute
-    {
+        public Guid Guid { get; set; }
+        public string src { get; set; }
+        public string FileName { get; set; }
     }
 }

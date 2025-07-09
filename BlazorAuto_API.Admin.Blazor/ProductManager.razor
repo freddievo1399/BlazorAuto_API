@@ -3,7 +3,7 @@
 @inject SwalService Swal
 @inject IExecuteService<IProductManagerService> ProductService;
 <PageHeaderContent>
-	<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
+	<PageHeader PageTitle="Quản lý Sản phẩm" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
 </PageHeaderContent>
 <SfDialog @ref=DialogAddCategori Width="250px" Visible=false AllowDragging="true" ShowCloseIcon="true">
 	<DialogTemplates>
@@ -47,9 +47,6 @@
 	</GridColumns>
 </SfGrid>
 @code {
-	RenderFragment PageHeaderContent => @<PageHeader PageTitle="Quản lý Danh mục"
-			RefeshEvent="@(() => grid.Refresh())"
-			AddEvent="OpenDialogAddCategori" />;
 
 	ProductCreateModel productCreateModel = null;
 	SfDialog DialogAddCategori;

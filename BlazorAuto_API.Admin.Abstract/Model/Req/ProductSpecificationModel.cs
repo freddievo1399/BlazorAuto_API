@@ -9,10 +9,13 @@ namespace BlazorAuto_API.Admin.Abstract
 {
     public class ProductSpecificationModel
     {
-        [Required]
+        [Key]
+        [Display(AutoGenerateField = false)]
+        public Guid Guid { get; set; } = Guid.NewGuid();
+        [Required(ErrorMessage ="Nhập tên")]
         public string Name { get; set; } = default!;
 
-        [Required]
+        [Required(ErrorMessage ="Nhập giá")]
         public decimal Price { get; set; }
 
         public decimal? DicountPrice { get; set; }

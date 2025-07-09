@@ -80,7 +80,7 @@ namespace BlazorAuto_API.Admin.Server
         {
             try
             {
-                var rstTemp = await _DbContext.GetData<EntityCategory>(Request, x => x.Where(x => !x.IsDeleted).Include(x => x.ProductCategories).ThenInclude(x => x.Product));
+                var rstTemp = await _DbContext.GetData<EntityCategory>(Request, x => x.Where(x => !x.DeletedAt.HasValue).Include(x => x.ProductCategories).ThenInclude(x => x.Product));
                 var rst = PagedResultsOf<CategoriesInfoModel>.Ok(
                     rstTemp.Items.Select(x => new CategoriesInfoModel
                     {

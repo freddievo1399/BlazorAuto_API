@@ -20,7 +20,7 @@ namespace BlazorAuto_API.Infrastructure
 
         [Required]
         [MaxLength(100)]
-        public string CreatedBy { get; set; } = default!;
+        public string CreatedBy { get; set; } = "NA";
 
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlazorAuto_API.Abstract;
+using Microsoft.AspNetCore.Components.Forms;
 using RestEase;
 using Syncfusion.Blazor;
 
@@ -20,5 +21,8 @@ namespace BlazorAuto_API.Admin.Abstract
 
         [Post(nameof(Update))]
         Task<Result> Update([Body] ProductUpdateModel Request);
+
+        [Post(nameof(RemoveImage))]
+        Task<Result> RemoveImage([Body] ReqDeleteImages Request);
     }
 }
