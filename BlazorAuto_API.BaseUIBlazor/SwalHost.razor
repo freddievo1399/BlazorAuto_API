@@ -1,24 +1,39 @@
 ﻿@using BlazorAuto_API.Abstract
+@using BlazorAuto_API.BaseUIBlazor.Components
 @using Syncfusion.Blazor.Popups
 @inject SwalService SwalService
 
 @if (IsVisible)
 {
 	<div class="swal-overlay">
-		<div class="swal-dialog @TypeCss">
+		<div class="swal-dialog">
 			<div class="swal-header">
-				<span class="swal-title">@Title</span>
+				@{
+					if (swalType == SwalType.Warning)
+					{
+						<SwalWarning />
+					}
+					else if (swalType == SwalType.Confirm)
+					{
+						<SwalConfirm />
+					}
+					else if (swalType == SwalType.Success)
+					{
+						<SwalSuccess />
+					}
+					else if (swalType == SwalType.Error)
+					{
+						<SwalError />
+					}
+					else
+					{
+						<SwalLoading />
+					}
+				}
 			</div>
-			<div class="swal-body">
-				@if (swalType == SwalType.Loadding)
-				{
-					<div class="swal-spinner"></div>
-					<p>@Message</p>
-				}
-				else
-				{
-					<p>@Message</p>
-				}
+            <div class="swal-body">
+				<span class="swal-title"><strong>@Title</strong> </span>
+				<p>@Message</p>
 			</div>
 			@if (swalType != SwalType.Loadding)
 			{
@@ -26,7 +41,7 @@
 					<button class="swal-btn ok" @onclick="OnConfirm">OK</button>
 					@if (swalType == SwalType.Confirm && ShowCancel)
 					{
-						<button class="swal-btn cancel" @onclick="OnCancel">Hủy</button>
+						<button class="swal-btn cancel" @onclick="OnCancel">Cancel</button>
 					}
 				</div>
 			}
@@ -43,6 +58,7 @@
 	private bool ShowCancel = true;
 	private SwalType swalType = SwalType.Info;
 	private TaskCompletionSource<SwalResult> tcs;
+	private string UrlGif = "";
 
 	private string TypeCss => swalType switch
 	{
@@ -67,7 +83,7 @@
 		ShowCancel = showCancel;
 		IsVisible = true;
 		swalType = type;
-
+		
 		switch (type)
 		{
 			case SwalType.Loadding:

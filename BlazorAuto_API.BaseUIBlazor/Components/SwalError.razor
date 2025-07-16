@@ -1,0 +1,154 @@
+﻿<style>
+    svg {
+        width: 6rem;
+        height: 6rem;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    /* Optional: Smooth reveal effect */
+    @@keyframes fadeInUp {
+    from
+    {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    svg {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Hiệu ứng từng lớp */
+    .cls-1 {
+        animation: zoomFade 0.6s ease-out forwards;
+        transform-origin: center;
+    }
+
+    .cls-2 {
+        animation: scaleUp 0.6s ease-out forwards;
+        animation-delay: 0.3s;
+        transform-origin: center;
+    }
+
+    .cls-3 {
+        animation: pulseIn 0.8s ease-out forwards;
+        animation-delay: 0.6s;
+        transform-origin: center;
+    }
+
+    .cls-4 {
+        animation: drawCheck 1.2s ease-out forwards;
+        transform-box: fill-box;
+        transform-origin: center;
+        fill: white;
+    }
+
+        .cls-4:nth-of-type(4) {
+            animation-delay: 1s;
+        }
+
+    .cls-1 {
+        fill: #226122;
+        filter: url(#filter);
+    }
+
+    .cls-2, .cls-4 {
+        fill: #fff;
+    }
+
+    .cls-3 {
+        fill: #0ec00e;
+        filter: url(#filter-2);
+    }
+
+    .cls-4 {
+        fill-rule: evenodd;
+    }
+
+    /* Animations */
+    @@keyframes zoomFade {
+    0%
+    {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    }
+
+    @@keyframes scaleUp {
+    0%
+    {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    }
+
+    @@keyframes pulseIn {
+    0%
+    {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+    }
+
+    @@keyframes drawCheck {
+    0%
+    {
+        transform: scale(0.4) rotate(-45deg);
+    }
+
+    60% {
+        transform: scale(1.05) rotate(0deg);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+    }
+</style>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="640" height="640" viewBox="0 0 640 640">
+    <defs>
+        <filter id="filter" x="6" y="6" width="628" height="628" filterUnits="userSpaceOnUse">
+            <feFlood result="flood" flood-color="#b43a3a" />
+            <feComposite result="composite" operator="in" in2="SourceGraphic" />
+            <feBlend result="blend" in2="SourceGraphic" />
+        </filter>
+        <filter id="filter-2" x="35" y="39" width="562" height="562" filterUnits="userSpaceOnUse">
+            <feFlood result="flood" flood-color="#f55" />
+            <feComposite result="composite" operator="in" in2="SourceGraphic" />
+            <feBlend result="blend" in2="SourceGraphic" />
+        </filter>
+    </defs>
+    <circle class="cls-1" cx="320" cy="320" r="314" />
+    <circle id="Ellipse_1_Kopie" data-name="Ellipse 1 Kopie" class="cls-2" cx="317" cy="320" r="290" />
+    <circle id="Ellipse_1_Kopie_2" data-name="Ellipse 1 Kopie 2" class="cls-3" cx="316" cy="320" r="281" />
+    <path id="Rechteck_1" data-name="Rechteck 1" class="cls-4" d="M397.875,191.993l50.132,50.132-205.3,205.3L192.573,397.3Z" />
+    <path id="Rechteck_1_Kopie" data-name="Rechteck 1 Kopie" class="cls-4" d="M447.743,397.813l-50.194,50.194L191.993,242.451l50.194-50.194Z" />
+</svg>

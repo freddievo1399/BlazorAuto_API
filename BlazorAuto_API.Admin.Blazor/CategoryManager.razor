@@ -3,6 +3,11 @@
 <PageHeaderContent>
 	<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
 </PageHeaderContent>
+<SfButton OnClick="@(() => Swal.Success("Success"))">Success</SfButton>
+<SfButton OnClick="@(() => Swal.Error("Error"))">Error</SfButton>
+<SfButton OnClick="@(() => Swal.Warning("Warning"))">Warning</SfButton>
+<SfButton OnClick="@(() => Swal.Confirm("Confirm"))">Confirm</SfButton>
+<SfButton OnClick="@(() => Swal.Loading())">Loading</SfButton>
 <SfDialog @ref=DialogAddCategori Width="250px" Visible=false AllowDragging="true" ShowCloseIcon="true">
 	<DialogTemplates>
 		<Header> Tạo Danh mục hàng </Header>
