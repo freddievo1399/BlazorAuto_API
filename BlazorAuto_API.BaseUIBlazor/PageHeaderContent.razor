@@ -1,7 +1,7 @@
 ﻿@code {
-    [CascadingParameter] public PageHeaderContentManager HeaderManager { get; set; }
+    [CascadingParameter] public PageHeaderContentManager? HeaderManager { get; set; }
 
-    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
     protected override void OnInitialized()
     {

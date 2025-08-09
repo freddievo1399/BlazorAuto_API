@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlazorAuto_API.Infrastructure
+namespace BlazorAuto_API.Abstract
 {
     public class PermistionAttribute : Attribute
     {

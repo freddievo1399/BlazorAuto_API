@@ -17,13 +17,11 @@ namespace BlazorAuto_API.Admin.Server
         
         public void RegisterPermistion()
         {
-            GlobalPermistion.Register<CategoriesManagerController.PERMISSION>();
-            GlobalPermistion.Register<ProductManagerController.PERMISSION>();
-            GlobalPermistion.Register<ProductDetailController.PERMISSION>();
-            GlobalPermistion.Register<ManagerUserController.PERMISSION>();
-            GlobalPermistion.Register<ManagerRoleController.PERMISSION>();
-            GlobalPermistion.Register<AuthenticationController.PERMISSION>();
-            
+            GlobalPermistion.Register<ICategoriesManagerService.PERMISSION>();
+            GlobalPermistion.Register<IProductManagerService.PERMISSION>();
+            GlobalPermistion.Register<IProductDetailService.PERMISSION>();
+            GlobalPermistion.Register<IManagerUser.PERMISSION>();
+            GlobalPermistion.Register<IManagerRole.PERMISSION>();
         }
 
         public void RegisterServices(IServiceCollection services)
@@ -33,8 +31,6 @@ namespace BlazorAuto_API.Admin.Server
             services.AddScoped<IProductDetailService, ProductDetailController>();
             services.AddScoped<IManagerUser, ManagerUserController>();
             services.AddScoped<IManagerRole, ManagerRoleController>();
-            services.AddScoped<IAuthenticationService, AuthenticationController>();
-
         }
     }
 }

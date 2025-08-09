@@ -39,6 +39,16 @@ public static class AssembliesUtil
         var Assemblies = allAssemblies?.Where(x => x.ManifestModule.Name.EndsWith("Blazor.dll")).ToList() ?? new List<Assembly>();
         return Assemblies;
     }
+    public static IEnumerable<Assembly> GetAssembliesServer()
+    {
+        if (allAssemblies == null)
+        {
+            GetAssemblies();
+        }
+
+        var Assemblies = allAssemblies?.Where(x => x.ManifestModule.Name.EndsWith("Server.dll")).ToList() ?? new List<Assembly>();
+        return Assemblies;
+    }
     public static IEnumerable<T> GetInstances<T>(this IEnumerable<Assembly> assemblies)
     {
         if (allAssemblies == null)

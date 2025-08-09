@@ -14,8 +14,8 @@
 
     SfRichTextEditor sfRichTextEditor=new();
     [Parameter]
-    public string Value { get; set; }
-    
+    public string Value { get; set; } = "";
+
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
     private List<ToolbarItemModel> Items = new List<ToolbarItemModel>()

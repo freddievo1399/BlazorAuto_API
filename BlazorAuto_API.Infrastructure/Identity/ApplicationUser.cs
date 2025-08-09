@@ -18,5 +18,7 @@ namespace BlazorAuto_API.Infrastructure
         public string? CreateUserId { get; set; } = "";
         public DateTime? RemovedAt { get; set; }
         public string? RemovedUserId { get; set; }
+
+        public virtual ICollection<EntityRefreshTokenEntityBase> RefreshTokens { get; set; } = new List<EntityRefreshTokenEntityBase>();
     }
 }

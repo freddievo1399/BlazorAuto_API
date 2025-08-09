@@ -14,8 +14,8 @@ namespace BlazorAuto_API.Abstract
 
     public class DataRequestDto
     {
-        public int? Skip { get; set; }
-        public int? Take { get; set; }
+        public int? Skip { get; set; } = 0;
+        public int? Take { get; set; } = 0;
         public bool? RequiresCounts { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<WhereFilter>? Where { get; set; }
@@ -46,19 +46,19 @@ namespace BlazorAuto_API.Abstract
                 Skip = request.Skip,
                 Take = request.Take,
                 RequiresCounts = request.RequiresCounts,
-                Where = request.Where,
-                Sorted = request.Sorted,
-                Search = request.Search,
-                Group = request.Group,
-                Aggregates = request.Aggregates,
-                Select = request.Select,
-                Expand = request.Expand,
-                Params = request.Params,
-                Distinct = request.Distinct,
-                IdMapping = request.IdMapping,
-                antiForgery = request.antiForgery,
-                GroupByFormatter = request.GroupByFormatter,
-                Table = request.Table
+                Where = request.Where ?? new(),
+                Sorted = request.Sorted ?? new(),
+                Search = request.Search ?? new(),
+                Group = request.Group ?? new(),
+                Aggregates = request.Aggregates ?? new(),
+                Select = request.Select ?? new(),
+                Expand = request.Expand ?? new(),
+                Params = request.Params ?? new Dictionary<string, object>(),
+                Distinct = request.Distinct ?? new(),
+                IdMapping = request.IdMapping ?? "",
+                antiForgery = request.antiForgery ?? "",
+                GroupByFormatter = request.GroupByFormatter ?? new Dictionary<string, string>(),
+                Table = request.Table ?? ""
             };
         }
 

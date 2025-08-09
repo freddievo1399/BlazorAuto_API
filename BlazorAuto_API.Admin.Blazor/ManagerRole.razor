@@ -1,37 +1,95 @@
 ﻿@page "/admin/ManagerRole"
 @inject IBlazorService<IManagerRole> ManagerRoleService;
+@inject IJSRuntime JSRuntime;
 <PageHeaderContent>
-	<PageHeader PageTitle="Quản lý người dùng" ></PageHeader>
+	<PageHeader PageTitle="Quản lý người dùng"></PageHeader>
 </PageHeaderContent>
 @* AddEvent="OpenDialogAddUser" *@
 
 <div class="container-fluid row">
 	<div class="col-3">
-		Danh sach phân quyền
-@* 		<SfListBox TValue="Role[]" DataSource="roles" TItem="Role" @bind-Value=roleSelected>
-			<ListBoxFieldSettings Text="RoleName" />
-    <ListBoxSelectionSettings ShowCheckbox="true" ShowSelectAll="true"></ListBoxSelectionSettings>
-</SfListBox>	 *@
+		<div class="row">Các phân quyền</div>
+		@for (int i = 0; i < roles.Count; i++)
+		{
+			var index = i;
+			<div class="row" @onclick="@(()=>selectRole(index))">@roles[index].RoleName</div>
+		}
 	</div>
-	<div class="col-9">Nội dung phân quyền</div>
+	<div class="col-9">
+		<div class="row">Nội dung phân quyền</div>
+		<div class="row">
+			@RoleSelected.RoleName
+		</div>
+		@foreach (var group in Features.GroupBy(x => x.Group))
+		{
+			@group.Key
+			@foreach (var feature in group)
+			{
+				<div class="row">
+					<div class="row">
+						@feature.NameVi
+					</div>
+					@foreach (var permistion in feature.permistionModels)
+					{
+						<SfCheckBox @bind-Checked=permistion.IsChecked Label="@permistion.NameVi"></SfCheckBox>
+					}
+				</div>
+			}
+		}
+	</div>
 </div>
 
 @code {
-	IManagerRole service => ManagerRoleService.GetService();
 	List<Role> roles = new();
-	Role roleSelected = new();
+	int SelectedIndex = 0;
+	Role RoleSelected => roles.Count != 0 ? roles[SelectedIndex] : new();
 	List<string> userNames = [];
-	protected override async Task OnInitializedAsync()
+	List<FeaturesModel> Features = new();
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		var rpsUsers = await service.GetUsers();
+		if (firstRender)
+		{
+			await LoadData();
+			UpdateFeature();
+
+		}
+		StateHasChanged();
+	}
+	private async Task LoadData()
+	{
+		var rpsUsers = await ManagerRoleService.Excute(service => service.GetUsers());
 		if (rpsUsers.Success)
 		{
 			userNames = rpsUsers.Items.ToList();
 		}
-		var rspRoles = await service.GetData();
+		var rspRoles = await ManagerRoleService.Excute(service => service.GetData());
 		if (rspRoles.Success)
 		{
 			roles = rspRoles.Items.ToList();
 		}
+		var rspFeature = await ManagerRoleService.Excute(service => service.GetFeature());
+		if (rspFeature.Success)
+		{
+			Features = rspFeature.Items.ToList();
+		}
+		StateHasChanged();
+	}
+	private void UpdateFeature()
+	{
+		var role = RoleSelected;
+		foreach (var feature in Features)
+		{
+			var permistionTotal = role.Permissions.FirstOrDefault(p => p.Name == feature.Name) ?? new();
+			foreach (var permistion in feature.permistionModels)
+			{
+				permistion.IsChecked = ClaimsPrincipalUltil.HasPermisson(permistionTotal.PermissionValue, permistion.Value);
+			}
+		}
+	}
+	void selectRole(int selectedIndex)
+	{
+		SelectedIndex = selectedIndex;
+		UpdateFeature();
+		StateHasChanged();
 	}
 }

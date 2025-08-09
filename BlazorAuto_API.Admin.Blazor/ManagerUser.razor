@@ -7,7 +7,7 @@
 
 <SfGrid @ref=grid TValue="UserInfoModel">
 	<SfDataManager Adaptor="Adaptors.CustomAdaptor">
-		<CustomAdaptorGridBlazor GetDataMethod="GetData"></CustomAdaptorGridBlazor>
+		<CustomAdaptorGridBlazor GetDataMethod="GetData"/>
 	</SfDataManager>
 </SfGrid>
 @* 	<GridColumns>
@@ -52,7 +52,6 @@
 	</DialogButtons>
 </SfDialog>
 @code {
-	IManagerUser service => ManagerUserService.GetService();
 	SfDialog DialogAddUser = new();
 	private SfGrid<UserInfoModel> grid = new();
 	UserCreateModel? userCreateModel;
@@ -71,7 +70,7 @@
 			return;
 		}
 		await Swal.Loading("Đang sử lý");
-		var rsp = await service.CreateUser(userCreateModel);
+		var rsp = await ManagerUserService.Excute(service=> service.CreateUser(userCreateModel));
 		if (rsp.Success)
 		{
 			await Swal.Success("Thành công");
@@ -86,7 +85,7 @@
 	}
 	private async Task<PagedResultsOf<UserInfoModel>> GetData(DataManagerRequest request)
 	{
-		var rsp = await service.GetAllUsersAsync(request);
+		var rsp = await ManagerUserService.Excute(service=> service.GetAllUsersAsync(request));
 		return rsp;
 	}
 }

@@ -9,9 +9,10 @@ namespace BlazorAuto_API.Abstract
 {
     public interface IBlazorService<T>
     {
-        T GetService();
-        V Excute<V>(Func<T, V> func);
-        ClaimsPrincipal User { get; }
-        void SetUser(string Token);
+        Task<Result> Excute(Func<T, Task<Result>> func);
+        Task<ResultOf<V>> Excute<V>(Func<T, Task<ResultOf<V>>> func);
+        Task<ResultsOf<V>> Excute<V>(Func<T, Task<ResultsOf<V>>> func);
+        Task<PagedResultsOf<V>> Excute<V>(Func<T, Task<PagedResultsOf<V>>> func);
+        Task<ClaimsPrincipal> GetUser();
     }
 }

@@ -1,13 +1,9 @@
 ﻿@page "/admin/categorie"
-@inject IExecuteService<ICategoriesManagerService> CategoriesService;
+@inject IBlazorService<ICategoriesManagerService> CategoriesService;
 <PageHeaderContent>
 	<PageHeader PageTitle="Quản lý Danh mục" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
 </PageHeaderContent>
-<SfButton OnClick="@(() => Swal.Success("Success"))">Success</SfButton>
-<SfButton OnClick="@(() => Swal.Error("Error"))">Error</SfButton>
-<SfButton OnClick="@(() => Swal.Warning("Warning"))">Warning</SfButton>
-<SfButton OnClick="@(() => Swal.Confirm("Confirm"))">Confirm</SfButton>
-<SfButton OnClick="@(() => Swal.Loading())">Loading</SfButton>
+
 <SfDialog @ref=DialogAddCategori Width="250px" Visible=false AllowDragging="true" ShowCloseIcon="true">
 	<DialogTemplates>
 		<Header> Tạo Danh mục hàng </Header>
@@ -20,7 +16,7 @@
 		</Content>
 	</DialogTemplates>
 	<DialogButtons>
-		<SfButton HtmlAttributes="@(new Dictionary<string, object> { { "type", "submit" },{"form","formsubmit"} })">OK</SfButton>
+		<DialogButton Type="ButtonType.Submit" HtmlAttributes="@(new Dictionary<string, object> {{"form","formsubmit"} })">OK</DialogButton>
 		<DialogButton Content="Cancel" OnClick=@(()=>DialogAddCategori.HideAsync()) />
 	</DialogButtons>
 </SfDialog>
@@ -35,14 +31,13 @@
 	</GridColumns>
 </SfGrid>
 @code {
-	CategoriesCreateModel categoriesCreateModel = null;
-	SfDialog DialogAddCategori;
-	ICategoriesManagerService service => CategoriesService.GetService();
-	private SfGrid<CategoriesInfoModel> grid;
+	CategoriesCreateModel categoriesCreateModel = new();
+	SfDialog DialogAddCategori = new();
+	private SfGrid<CategoriesInfoModel> grid = new();
 
 	private async Task<PagedResultsOf<CategoriesInfoModel>> GetData(DataManagerRequest request)
 	{
-		var rsp = await service.GetData(request);
+		var rsp = await CategoriesService.Excute(service => service.GetData(request));
 		return rsp;
 	}
 	private async Task OpenDialogAddCategori()
@@ -53,7 +48,7 @@
 	private async Task OnValidSubmit()
 	{
 		await Swal.Loading("Vui lòng đợi");
-		var rsp = await service.Add(categoriesCreateModel);
+		var rsp = await CategoriesService.Excute(service => service.Add(categoriesCreateModel));
 		if (rsp.Success)
 		{
 			await Swal.Close();

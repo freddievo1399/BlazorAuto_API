@@ -8,9 +8,9 @@ namespace BlazorAuto_API.Abstract;
 
 public class Result
 {
-    public bool Success { get; set; }
+    public bool Success { get; set; } = false;
 
-    public string Message { get; set; }
+    public string Message { get; set; } = "";
 
     public Result()
     {
@@ -28,8 +28,6 @@ public class Result
     {
         return new Result { Message = error };
     }
-
-    public ValueTuple<bool, string> AsValueTuple() => new(Success, Message);
 
     public static implicit operator Result(string error)
     {
@@ -49,7 +47,8 @@ public class Result
 
 public class ResultOf<T> : Result
 {
-    public ResultOf() { }
+    public ResultOf() { 
+    }
 
     public ResultOf(bool s, string m, T i)
     {
@@ -59,7 +58,7 @@ public class ResultOf<T> : Result
     }
 
 
-    public T Item { get; set; }
+    public T Item { get; set; } = default!;
 
 
     public static ResultOf<T> Ok(T item)
@@ -85,6 +84,10 @@ public class ResultOf<T> : Result
 
     public static implicit operator ResultOf<T>(T item)
     {
+        if (item == null)
+        {
+            return "Not found: Dev not check null";
+        }
         return ResultOf<T>.Ok(item);
     }
 
@@ -102,7 +105,7 @@ public class ResultOf<T> : Result
 public class ResultsOf<T> : Result
 {
 
-    public IEnumerable<T> Items { get; set; } = new List<T>();
+    public IEnumerable<T> Items { get; set; } = [];
 
     public ResultsOf(bool success, string message, IEnumerable<T> items)
     {
@@ -120,12 +123,10 @@ public class ResultsOf<T> : Result
         return new ResultsOf<T> { Success = true, Items = items };
     }
 
-    public static ResultsOf<T> Error(string msg = "")
+    public static new ResultsOf<T> Error(string msg = "")
     {
         return new ResultsOf<T> { Message = msg };
     }
-
-    public ValueTuple<bool, string, IEnumerable<T>> AsValueTuple() => new(Success, Message, Items);
 
     public static implicit operator ResultsOf<T>(string error)
     {
@@ -144,7 +145,7 @@ public class ResultsOf<T> : Result
 
     public static implicit operator T[](ResultsOf<T> result)
     {
-        return result.Success ? result.Items.ToArray() : new T[0];
+        return result.Success ? result.Items.ToArray() : [];
     }
     public static implicit operator ResultsOf<T>((bool, string, IEnumerable<T> T) result)
     {
@@ -160,7 +161,7 @@ public class ResultsOf<T> : Result
 public class PagedResultsOf<T> : Result
 {
 
-    public IEnumerable<T> Items { get; set; }
+    public IEnumerable<T> Items { get; set; }=[];
 
     public int TotalCount { get; set; }
 
@@ -175,12 +176,10 @@ public class PagedResultsOf<T> : Result
         return new PagedResultsOf<T> { Success = true, Items = data, TotalCount = totalCount };
     }
 
-    public static PagedResultsOf<T> Error(string msg = "")
+    public static new PagedResultsOf<T> Error(string msg = "")
     {
         return new PagedResultsOf<T> { Message = msg };
     }
-
-    public ValueTuple<bool, string, IEnumerable<T>, int> AsValueTuple() => new(Success, Message, Items, TotalCount);
 
     public static implicit operator PagedResultsOf<T>(string error)
     {
@@ -189,27 +188,6 @@ public class PagedResultsOf<T> : Result
 
     public static implicit operator PagedResultsOf<T>(List<T> data)
     {
-        return new PagedResultsOf<T> { Success = true, Items = data, TotalCount = data.Count() };
-    }
-}
-
-public static class ResultUtil
-{
-    public static async Task<ValueTuple<bool, string>> AsTuple<T>(this Task<Result> task)
-    {
-        var result = await task;
-        return new(result.Success, result.Message);
-    }
-
-    public static async Task<ValueTuple<bool, string, T>> AsTuple<T>(this Task<ResultOf<T>> task)
-    {
-        var result = await task;
-        return new(result.Success, result.Message, result.Item);
-    }
-
-    public static async Task<ValueTuple<bool, string, IEnumerable<T>>> AsTuple<T>(this Task<ResultsOf<T>> task)
-    {
-        var result = await task;
-        return new(result.Success, result.Message, result.Items);
+        return new PagedResultsOf<T> { Success = true, Items = data, TotalCount = data.Count };
     }
 }

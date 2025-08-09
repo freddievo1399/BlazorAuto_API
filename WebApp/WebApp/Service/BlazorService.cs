@@ -1,36 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BlazorAuto_API.Abstract;
+using RestEase;
 
 namespace WebApp
 {
-    public class BlazorService<T> : IBlazorService<T>
+    public class BlazorService<T>(T service, IAuthentication authenticationService) : IBlazorService<T>
     {
-        T _apiService { get; set; }
-        static ClaimsPrincipal _user = new();
-        public ClaimsPrincipal User { get => _user;}
-
-        public BlazorService(T service)
+        public async Task<ClaimsPrincipal> GetUser()
         {
-            _apiService = service;
-        }
-        public T GetService()
-        {
-            return _apiService;
-        }
-        public V Excute<V>(Func<T, V> func)
-        {
-
-            return func(_apiService);
+            var result = await authenticationService.GetInfo();
+            return result.Item!;
         }
 
-        public void SetUser(string Token)
+        public async Task<Result> Excute(Func<T, Task<Result>> func)
         {
-            _user=JwtHelper.CreatePrincipalFromToken(Token);
+            var hasPermission = await authenticationService.CheckPermistion();
+            if (!hasPermission.Success)
+            {
+                return hasPermission.Message;
+            }
+            return await func(service);
+        }
+
+        public async Task<ResultOf<V>> Excute<V>(Func<T, Task<ResultOf<V>>> func)
+        {
+            var hasPermission = await authenticationService.CheckPermistion();
+            if (!hasPermission.Success)
+            {
+                return hasPermission.Message;
+            }
+            return await func(service);
+        }
+
+        public async Task<ResultsOf<V>> Excute<V>(Func<T, Task<ResultsOf<V>>> func)
+        {
+            var hasPermission = await authenticationService.CheckPermistion();
+            if (!hasPermission.Success)
+            {
+                return hasPermission.Message;
+            }
+            return await func(service);
+        }
+        public async Task<PagedResultsOf<V>> Excute<V>(Func<T, Task<PagedResultsOf<V>>> func)
+        {
+            var hasPermission = await authenticationService.CheckPermistion();
+            if (!hasPermission.Success)
+            {
+                return hasPermission.Message;
+            }
+            return await func(service);
         }
     }
 }

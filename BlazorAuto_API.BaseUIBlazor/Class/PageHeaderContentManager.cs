@@ -9,10 +9,15 @@ namespace BlazorAuto_API.BaseUIBlazor
 {
     public class PageHeaderContentManager
     {
-        public RenderFragment Content { get; private set; }
+        public RenderFragment Content { get; private set; } = _ => { };
 
-        public void Set(RenderFragment content)
+        public void Set(RenderFragment? content)
         {
+            if (content == null)
+            {
+                Content = _ => { };
+                return;
+            }
             Content = content;
         }
     }

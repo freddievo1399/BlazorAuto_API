@@ -5,35 +5,44 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BlazorAuto_API.Abstract;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using RestEase;
 
-namespace WebApp.Client.Service
+namespace WebApp.Client
 {
-    public class BlazorService<T> : IBlazorService<T>
+    public class BlazorService<T>(HttpClient httpClient, IAuthentication authenticationService) : IBlazorService<T>
     {
-        readonly T _apiClient;
+        readonly T _apiClient = RestClient.For<T>(httpClient);
 
-        static ClaimsPrincipal _user = new();
-
-        public ClaimsPrincipal User { get => _user; }
-
-        public BlazorService(HttpClient httpClient)
+        public async Task<ClaimsPrincipal> GetUser()
         {
-            _apiClient = RestClient.For<T>(httpClient);
-        }
-        public T GetService()
-        {
-            return _apiClient;
-        }
-        public V Excute<V>(Func<T, V> func)
-        {
-
-            return func.Invoke(_apiClient);
+            var result = await authenticationService.GetInfo();
+            return result.Item!;
         }
 
-        public void SetUser(string Token)
+        public async Task<Result> Excute(Func<T, Task<Result>> func)
         {
-            _user = JwtHelper.CreatePrincipalFromToken(Token);
+            return await func.Invoke(_apiClient);
+        }
+
+        public async Task<ResultOf<V>> Excute<V>(Func<T, Task<ResultOf<V>>> func)
+        {
+            return await func.Invoke(_apiClient);
+        }
+
+        public async Task<ResultsOf<V>> Excute<V>(Func<T, Task<ResultsOf<V>>> func)
+        {
+            return await func.Invoke(_apiClient);
+        }
+        public async Task<PagedResultsOf<V>> Excute<V>(Func<T, Task<PagedResultsOf<V>>> func)
+        {
+            var hasPermission = await authenticationService.CheckPermistion();
+            if (!hasPermission.Success)
+            {
+                return hasPermission.Message;
+            }
+            return await func.Invoke(_apiClient);
         }
     }
 }

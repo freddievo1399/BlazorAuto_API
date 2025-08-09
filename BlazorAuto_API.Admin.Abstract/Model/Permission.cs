@@ -8,7 +8,7 @@ namespace BlazorAuto_API.Admin.Abstract
 {
     public class Permission
     {
-        public string Name { get; set; }
-        public int PermissionValue { get; set; }
+        public string Name { get; set; } = "";
+        public int PermissionValue { get; set; } = 0;
     }
 }

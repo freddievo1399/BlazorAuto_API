@@ -6,21 +6,18 @@ using System.Threading.Tasks;
 using BlazorAuto_API.Abstract;
 using BlazorAuto_API.Admin.Abstract;
 using BlazorAuto_API.Infrastructure;
-using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RestEase;
 using Syncfusion.Blazor.Data;
-
 namespace BlazorAuto_API.Admin.Server;
+using static BlazorAuto_API.Admin.Abstract.IProductManagerService;
 
 [ApiController]
 [Route("/api/admin/[controller]")]
 [ApiExplorerSettings(GroupName = "Admin")]
 public class ProductManagerController : ControllerBase, IProductManagerService
 {
-    IDbContext _DbContext;
-
+    private readonly IDbContext _DbContext;
     public ProductManagerController(IDbContext DbContext)
     {
         _DbContext = DbContext;
@@ -30,18 +27,15 @@ public class ProductManagerController : ControllerBase, IProductManagerService
     {
         try
         {
-            using (var db = _DbContext.Connection())
+            using var db = _DbContext.Connection();
+            var abc = new EntityProduct()
             {
-                var abc = new EntityProduct()
-                {
-                    Name = Request.Name,
-                    Description = Request.Description,
-                    CreatedBy = "test"
-                };
-                await db.Set<EntityProduct>().AddAsync(abc);
-                await db.SaveChangesAsync();
-
-            }
+                Name = Request.Name!,
+                Description = Request.Description,
+                CreatedBy = "test"
+            };
+            await db.Set<EntityProduct>().AddAsync(abc);
+            await db.SaveChangesAsync();
             return true;
         }
         catch (Exception ex)
@@ -55,23 +49,21 @@ public class ProductManagerController : ControllerBase, IProductManagerService
         try
         {
 
-            using (var db = _DbContext.Connection())
+            using var db = _DbContext.Connection();
+            var entityProduct = await db.Set<EntityProduct>().Include(x => x.Specifications).Include(x => x.ProductCategories).
+                ThenInclude(x => x.Category).FirstOrDefaultAsync(x => x.Guid == Guid);
+            if (entityProduct != null)
             {
-                var entityProduct = await db.Set<EntityProduct>().Include(x => x.Specifications).Include(x => x.ProductCategories).
-                    ThenInclude(x => x.Category).FirstOrDefaultAsync(x => x.Guid == Guid);
-                if (entityProduct != null)
+                var res = new ProductInfoModel
                 {
-                    var res = new ProductInfoModel
-                    {
-                        Guid = entityProduct.Guid,
-                        Name = entityProduct.Name,
-                        Description = entityProduct.Description
-                    };
-                    return res;
+                    Guid = entityProduct.Guid,
+                    Name = entityProduct.Name,
+                    Description = entityProduct.Description
+                };
+                return res;
 
-                }
-                return "Không tim thấy";
             }
+            return "Không tim thấy";
         }
         catch (Exception ex)
         {
@@ -102,18 +94,16 @@ public class ProductManagerController : ControllerBase, IProductManagerService
     [HttpPost(nameof(Remove))]
     public async Task<Result> Remove(Guid Guid)
     {
-        using (var db = _DbContext.Connection())
+        using var db = _DbContext.Connection();
+        var model = await db.Set<EntityProduct>().FirstOrDefaultAsync(x => x.Guid == Guid);
+        if (model == null)
         {
-            var model = await db.Set<EntityProduct>().FirstOrDefaultAsync(x => x.Guid == Guid);
-            if (model == null)
-            {
-                return "Không tìm thấy";
-            }
-            model.DeletedBy = "test";
-            model.DeletedAt = DateTime.Now;
-            db.Set<EntityProduct>().Update(model);
-            await db.SaveChangesAsync();
-            return true;
+            return "Không tìm thấy";
         }
+        model.DeletedBy = "test";
+        model.DeletedAt = DateTime.Now;
+        db.Set<EntityProduct>().Update(model);
+        await db.SaveChangesAsync();
+        return true;
     }
 }

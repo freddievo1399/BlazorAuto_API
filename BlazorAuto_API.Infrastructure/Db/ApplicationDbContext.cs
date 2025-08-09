@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Azure.Core;
 using BlazorAuto_API.Abstract;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -8,10 +9,12 @@ using Syncfusion.Blazor;
 
 namespace BlazorAuto_API.Infrastructure
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,string>
     {
+        public static DbContextOptions<ApplicationDbContext> Options;
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+            Options = options;
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,12 +33,17 @@ namespace BlazorAuto_API.Infrastructure
                 {
                     entity.ToTable(nameTable.Value?.ToString());
                 }
-                entity.HasIndex("Guid").IsUnique();
 
                 var props = entity.Metadata.GetDeclaredProperties();
                 foreach (IMutableProperty prop in props)
                 {
+
                     var propEntity = entity.Property(prop.Name);
+                    if (prop.Name == "Guid")
+                    {
+                        entity.HasIndex("Guid").IsUnique();
+                        continue;
+                    }
                     var clrType = prop.ClrType;
                     if (clrType == typeof(string))
                     {

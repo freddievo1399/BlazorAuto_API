@@ -8,7 +8,7 @@ namespace BlazorAuto_API.Admin.Abstract
 {
     public class Role
     {
-        public string RoleName { get; set; }
+        public string RoleName { get; set; } = "";
         public List<string> UserNames { get; set; } = new();
         public List<Permission> Permissions { get; set; } = new();
     }

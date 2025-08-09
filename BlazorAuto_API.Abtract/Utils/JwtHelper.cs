@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace BlazorAuto_API.Abstract;
@@ -18,34 +20,70 @@ public static class JwtHelper
 
         var identity = new ClaimsIdentity(jwtToken.Claims, "jwt");
         var principal = new ClaimsPrincipal(identity);
-
         return principal;
     }
-    public static string CreateUnsignedJwt(List<Claim> claims)
+    public static string GetJsonPrincipal(string token)
     {
-        // Header (alg: none)
-        var header = new { alg = "none", typ = "JWT" };
-        string headerJson = JsonConvert.SerializeObject(header);
-        string headerBase64 = Base64UrlEncode(headerJson);
+        var user = CreatePrincipalFromToken(token);
+        var identity = (ClaimsIdentity)user.Identity!;
 
-        // Payload (from claims)
-        var payloadDict = new Dictionary<string, string>();
-        foreach (var claim in claims)
-        {
-            payloadDict[claim.Type] = claim.Value;
-        }
-        string payloadJson = JsonConvert.SerializeObject(payloadDict);
-        string payloadBase64 = Base64UrlEncode(payloadJson);
+        var claimsList = identity.Claims
+            .Select(c => new Dictionary<string, string>
+            {
+                ["Type"] = c.Type,
+                ["Value"] = c.Value
+            }).ToList();
 
-        // Combine (no signature)
-        return $"{headerBase64}.{payloadBase64}.";
+        return JsonConvert.SerializeObject(claimsList);
     }
-
-    private static string Base64UrlEncode(string input)
+    public static ClaimsPrincipal CreatePrincipalFromJson(string jsonData)
     {
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes(input))
-            .TrimEnd('=')
-            .Replace('+', '-')
-            .Replace('/', '_');
+        if (jsonData == null)
+        {
+            return new();
+        }
+        var claimDictList = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonData);
+
+        if (claimDictList == null) return new ClaimsPrincipal();
+
+        var claims = claimDictList.Select(d => new Claim(d["Type"], d["Value"]));
+        var identity = new ClaimsIdentity(claims);
+        return new ClaimsPrincipal(identity);
+    }
+    public static ClaimsPrincipal CreatePrincipalFromJsonWithKey(string Token, string secretKey)
+    {
+        if (Token == null)
+        {
+            return new();
+        }
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true, // bỏ nếu chỉ muốn đọc
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = key,
+            ClockSkew = TimeSpan.Zero // bỏ trễ
+        };
+
+        var handler = new JwtSecurityTokenHandler();
+        try
+        {
+            var principal = handler.ValidateToken(Token, tokenValidationParameters, out var validatedToken);
+
+            // Kiểm tra có đúng JWT không
+            if (validatedToken is JwtSecurityToken jwt &&
+                jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.OrdinalIgnoreCase))
+            {
+                return principal;
+            }
+        }
+        catch (Exception)
+        {
+            return new();
+        }
+
+        return new();
     }
 }

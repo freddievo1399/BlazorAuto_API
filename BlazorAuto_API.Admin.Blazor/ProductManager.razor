@@ -1,7 +1,7 @@
 ﻿@page "/admin/product"
 @inject NavigationManager NavigationManager
 @inject SwalService Swal
-@inject IExecuteService<IProductManagerService> ProductService;
+@inject IBlazorService<IProductManagerService> ProductService;
 <PageHeaderContent>
 	<PageHeader PageTitle="Quản lý Sản phẩm" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddCategori"></PageHeader>
 </PageHeaderContent>
@@ -17,7 +17,7 @@
 		</Content>
 	</DialogTemplates>
 	<DialogButtons>
-		<SfButton HtmlAttributes="@(new Dictionary<string, object> { { "type", "submit" },{"form","formsubmit"} })">OK</SfButton>
+		<DialogButton Type="ButtonType.Submit" HtmlAttributes="@(new Dictionary<string, object> {{"form","formsubmit"} })">OK</DialogButton>
 		<DialogButton Content="Cancel" OnClick=@(()=>DialogAddCategori.HideAsync()) />
 	</DialogButtons>
 </SfDialog>
@@ -48,9 +48,9 @@
 </SfGrid>
 @code {
 
-	ProductCreateModel productCreateModel = null;
-	SfDialog DialogAddCategori;
-	private SfGrid<ProductInfoModel> grid;
+	ProductCreateModel productCreateModel = new();
+	SfDialog DialogAddCategori = new();
+	private SfGrid<ProductInfoModel> grid = new();
 	private async Task<PagedResultsOf<ProductInfoModel>> GetData(DataManagerRequest request)
 	{
 		var rsp = await ProductService.Excute(x => x.GetData(request));

@@ -13,6 +13,21 @@ namespace BlazorAuto_API.Admin.Abstract
 
     public interface IManagerUser
     {
+        [Feature("Danh mục", "Quản lý danh mục")]
+        public enum PERMISSION
+        {
+            [Permistion("Xem danh sách")]
+            ALLOW_VIEW,
+
+            [Permistion("Thêm")]
+            ALLOW_ADD,
+
+            [Permistion("Sửa")]
+            ALLOW_UPDATE,
+
+            [Permistion("Xóa")]
+            ALLOW_DELETE,
+        }
         [Post(nameof(GetAllUsersAsync))]
         Task<PagedResultsOf<UserInfoModel>> GetAllUsersAsync([Body] DataRequestDto Request);
 

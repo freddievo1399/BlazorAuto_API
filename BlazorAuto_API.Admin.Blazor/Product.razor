@@ -1,18 +1,14 @@
 ﻿@page "/admin/product/{Guid:guid}"
-@using Syncfusion.Blazor.DropDowns
+
 @using Syncfusion.Blazor.ImageEditor
-@using Syncfusion.Blazor.Lists
-@using Syncfusion.Blazor.Navigations
-@using System.ComponentModel.DataAnnotations
 @inject NavigationManager NavigationManager
 @inject SwalService Swal
 @inject IJSRuntime JS
-@inject IExecuteService<IProductDetailService> ProductService;
+@inject IBlazorService<IProductDetailService> ProductService;
 @inject HttpClient httpClient
 <PageHeaderContent>
 	<PageHeader PageTitle="Cấu hình sản phẩm"></PageHeader>
 </PageHeaderContent>
-
 <EditForm id="formsubmit" Model=ProductModel OnValidSubmit="OnValidSubmit">
 	<DataAnnotationsValidator />
 	<SfTextBox @bind-Value="ProductModel.Name" Placeholder="Tên" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
@@ -24,8 +20,8 @@
 		<InputFile OnChange="HandleFileSelected" accept="image/*" multiple class="Upload-Input" />
 	</div>
 	<div class="row">
-		<SfGrid @ref=grid  DataSource=ProductModel.ProductSpecifications  AutoFit EnableAutoFill AllowPaging="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Update", "Cancel" })">
-			<GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" AllowEditOnDblClick ></GridEditSettings>
+		<SfGrid @ref=grid DataSource=ProductModel.ProductSpecifications AutoFit EnableAutoFill AllowPaging="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Update", "Cancel" })">
+			<GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" AllowEditOnDblClick></GridEditSettings>
 		</SfGrid>
 	</div>
 	<div class="row">
@@ -115,20 +111,19 @@
 
 
 	private ProductDetailModel ProductModel = new();
-	IProductDetailService service => ProductService.GetService();
 	protected override async void OnInitialized()
 	{
 		await Swal.Loading("Đang load");
 	}
 	override protected async Task OnInitializedAsync()
 	{
-		var rspProduct = await service.FindByGuid(Guid);
+		var rspProduct = await ProductService.Excute(service => service.FindByGuid(Guid));
 		if (!rspProduct.Success)
 		{
 			return;
 		}
 		ProductModel = rspProduct.Item;
-		var rspCatelory = await service.GetListCategory();
+		var rspCatelory = await ProductService.Excute(service => service.GetListCategory());
 		if (!rspCatelory.Success)
 		{
 			await Swal.Error($"Load thất bại danh mục: {rspCatelory.Message}");
@@ -176,7 +171,7 @@
 				using (var memorydata = new MemoryStream(bytes))
 				{
 
-					multipartContent.Add(new StreamContent(memorydata), "UploadFile", ImageEditing!.FileName);
+					multipartContent.Add(new StreamContent(memorydata), "UploadFile", ImageEditing!.FileName!);
 					var uploadRsp = await httpClient.PostAsync($"/api/admin/ProductDetail/UpdateImage?Guid={Guid}&GuidImage={ImageEditing.Guid}",
 						multipartContent);
 					var result = await uploadRsp.GetResultAsync();
@@ -216,7 +211,7 @@
 			return;
 		}
 		await Swal.Loading("Vui lòng đợi");
-		var rsp = await service.Update(ProductModel);
+		var rsp = await ProductService.Excute(service => service.Update(ProductModel));
 		if (rsp.Success)
 		{
 			await Swal.Close();
@@ -232,7 +227,7 @@
 	string nameFuncDialog = "DialogAddImage";
 	string nameDialog = "DialogAddImage";
 	Func<Task>? ActionbuttionDialog;
-	private List<ImageInfoRes> DataImages =new();
+	private List<ImageInfoRes> DataImages = new();
 
 	private async Task HandleFileSelected(InputFileChangeEventArgs e)
 	{
@@ -247,7 +242,7 @@
 			var uploadRsp = await httpClient.PostAsync($"/api/admin/ProductDetail/UploadImage?Guid={Guid}",
 				multiPartContent);
 		}
-		var rspProduct = await service.FindByGuid(Guid);
+		var rspProduct = await ProductService.Excute(service => service.FindByGuid(Guid));
 		if (!rspProduct.Success)
 		{
 			//log ra
@@ -306,11 +301,11 @@
 	{
 		await Swal.Loading("Cập nhập");
 		var imageDeletes = DataImages.Where(x => x.Selected).ToList();
-		var rsp = await service.RemoveImage(new()
+		var rsp = await ProductService.Excute(service => service.RemoveImage(new()
 			{
 				Guid = Guid,
 				GuidImage = imageDeletes.Select(x => x.Guid).ToList()
-			});
+			}));
 		if (rsp.Success)
 		{
 			ProductModel.ImageInfos = ProductModel.ImageInfos.Where(x => !imageDeletes.Any(delete => delete.Guid == x.Guid)).ToList();

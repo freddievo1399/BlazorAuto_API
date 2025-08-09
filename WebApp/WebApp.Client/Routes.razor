@@ -4,7 +4,14 @@
 @using WebApp.Client.Layout.Customer
 @inject ILoadAssemlyBlazor Load ;
 @inject NavigationManager _navigationManager
-
+@if (OperatingSystem.IsBrowser())
+{
+	<p>Đây là Blazor WebAssembly (client-side)</p>
+}
+else
+{
+	<p>Đây là Blazor Server (server-side)</p>
+}
 <Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="AdditionalAssemblies">
 	<Found Context="routeData">
 		<RouteView RouteData="routeData" DefaultLayout="SelectLayout()" />

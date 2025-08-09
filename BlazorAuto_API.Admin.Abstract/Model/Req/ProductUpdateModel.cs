@@ -28,7 +28,7 @@ namespace BlazorAuto_API.Admin.Abstract
                 Description = model.Description,
                 Guid = model.Guid,
                 Name = model.Name,
-                ProductSpecifications = model.ProductSpecifications.ToList(),
+                ProductSpecifications = model.ProductSpecifications?.ToList()??new(),
                 RichDescription = model.RichDescription,                
             };
         }

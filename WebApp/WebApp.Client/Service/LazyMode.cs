@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using WebApp.Abstract;
 using WebApp.Abtract;
 
-namespace WebApp.Client.Service
+namespace WebApp.Client
 {
     public class LazyMode : ILoadAssemlyBlazor
     {

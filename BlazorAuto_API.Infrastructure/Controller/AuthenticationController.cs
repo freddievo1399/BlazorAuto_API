@@ -5,136 +5,150 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Azure.Core;
 using BlazorAuto_API.Abstract;
 using BlazorAuto_API.Infrastructure;
-using BlazorAuto_API.Infrastructure.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Syncfusion.Blazor.Data;
 
 namespace BlazorAuto_API.Admin.Server;
 
 [ApiController]
-[Route("/api/admin/[controller]")]
-[ApiExplorerSettings(GroupName = "Admin")]
-public class AuthenticationController : ControllerBase, IAuthenticationService
+[Route("/api/Auth/[controller]")]
+[ApiExplorerSettings(GroupName = "Auth")]
+[Authorize]
+public class AuthenticationController : ControllerBase, IAuthentication
 {
-
-    [Feature("Danh mục", "Quản lý danh mục")]
-    public enum PERMISSION
-    {
-        [Permistion("Xem danh sách")]
-        ALLOW_VIEW,
-
-        [Permistion("Thêm")]
-        ALLOW_ADD,
-
-        [Permistion("Sửa")]
-        ALLOW_UPDATE,
-
-        [Permistion("Xóa")]
-        ALLOW_DELETE,
-    }
-
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly IAuthenticationForServer _authService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IConfiguration _config;
-    public AuthenticationController(UserManager<ApplicationUser> userManager, IConfiguration config, RoleManager<ApplicationRole> roleManager, IHttpContextAccessor httpContextAccessor)
+
+
+    public AuthenticationController(IAuthenticationForServer authService, IHttpContextAccessor httpContextAccessor, IConfiguration config)
     {
-        _userManager = userManager;
-        _config = config;
-        _roleManager = roleManager;
+        _authService = authService;
         _httpContextAccessor = httpContextAccessor;
+        _config = config;
     }
+    [AllowAnonymous]
     [HttpPost(nameof(LoginAsync))]
-    public async Task<Result> LoginAsync([FromBody] RequestLogin requestLogin)
+    public async Task<ResultOf<AuthResponse>> LoginAsync([FromBody] RequestLogin requestLogin)
     {
-        var user = await _userManager.FindByNameAsync(requestLogin.UserName!);
-
-        if (user == null)
+        var context = _httpContextAccessor.HttpContext;
+        if (context == null)
         {
-            return "K thấy user này";
+            return "Không tìm thấy HttpContext";
+        }
+        var result = await _authService.LoginAsync(requestLogin);
+        if (result.Success)
+        {
+            return UpdateToken(result.Item, context);
+        }
+        return result.Message;
+    }
+    [AllowAnonymous]
+    [HttpGet(nameof(UpdateAuthenticationAsync))]
+    public async Task<ResultOf<AuthResponse>> UpdateAuthenticationAsync()
+    {
+        var context = _httpContextAccessor.HttpContext;
+        if (context == null)
+        {
+            return "Không tìm thấy HttpContext";
         }
 
-
-        var result = await _userManager.CheckPasswordAsync(user, requestLogin.Password!);
-
-        if (!await _roleManager.RoleExistsAsync("hehe"))
+        var hasRefeshToken = context.Request.Cookies.TryGetValue(_config["Jwt:RefeshTokenName"] ?? "TokenRefresh", out var refeshToken);
+        if (!hasRefeshToken)
         {
-
-            var abc = await _roleManager.CreateAsync(new() { Name = "hehe" });
-            await _userManager.AddToRoleAsync(user, "hehe");
+            return "Không thấy TokenRefresh";
         }
-        if (user == null)
+        var result = await _authService.RefreshTokenAsync(refeshToken!);
+        if (result.Success)
         {
-            return "Khong thấy người dùng với tên đăng nhập này";
+            return UpdateToken(result.Item, context);
         }
-
-
-        if (result)
+        return result.Message;
+    }
+    private ResultOf<AuthResponse> UpdateToken(AuthResponse rps, HttpContext context)
+    {
+        try
         {
-
-            var roleNames = await _userManager.GetRolesAsync(user);
-            List<Claim> claims = new()
-                {
-                    new Claim("sub", user.UserName!),
-                    //new Claim("jti", Guid.NewGuid().ToString()),
-                    new Claim(ClaimTypes.Name, user.UserName!),
-                };
-            foreach (var roleName in roleNames)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, roleName));
-                var role = await _roleManager.FindByNameAsync(roleName);
-                var claim = await _roleManager.GetClaimsAsync(role);
-                await _roleManager.FindByIdAsync(roleName);
-                //ApplicationRole identityRole = new(); identityRole.Name
-                claims.AddRange(claim);
-            }
-
-
-
-
-            var key = _config["Jwt:Key"];
-            var issuer = _config["jwt:Issuer"];
-            var audience = _config["jwt:Audience"];
-            var expires = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("jwt:ExpireationInMinutes"));
-            string nameAuthorizationCokie = _config["Jwt:AuthorizationName"]??"Token"; // đổi tên cookie cho đúng
-
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var tokenDescriptor = new SecurityTokenDescriptor()
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = expires,
-                SigningCredentials = credentials,
-                Issuer = issuer,
-                Audience = audience
-            };
-
-            var handler = new JsonWebTokenHandler();
-            var toke = handler.CreateToken(tokenDescriptor);
-
-            Response.Cookies.Append(nameAuthorizationCokie, $"{toke}", new CookieOptions
+            string nameAuthorizationCokie = _config["Jwt:AuthorizationName"] ?? "Token";
+            context.Response.Cookies.Append(nameAuthorizationCokie, $"{rps.AccessToken}", new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
-                Expires = expires
+                Expires = rps.AccessTokenExpiration,
             });
-            var context = _httpContextAccessor.HttpContext;
-            return Result.Ok(toke);
-        }
+            string nameRefeshToken = _config["Jwt:RefeshTokenName"] ?? "TokenRefresh";
 
-        return Result.Error("Mật khẩu sai");
+            context.Response.Cookies.Append(nameRefeshToken, $"{rps.RefreshToken}", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = rps.RefreshTokenExpiration,
+            });
+            return rps;
+        }
+        catch (Exception ex)
+        {
+
+            return ex.Message;
+        }
+    }
+    [AllowAnonymous]
+    [HttpGet(nameof(Logout))]
+    public Task<Result> Logout()
+    {
+        try
+        {
+            var context = _httpContextAccessor.HttpContext;
+            string nameAuthorizationCokie = _config["Jwt:AuthorizationName"] ?? "Token";
+            var hasAuthorizationCokie = context.Request.Cookies.ContainsKey(nameAuthorizationCokie);
+            if (hasAuthorizationCokie)
+            {
+                context.Response.Cookies.Delete(nameAuthorizationCokie);
+            }
+
+            string nameRefeshToken = _config["Jwt:RefeshTokenName"] ?? "TokenRefresh";
+            var hasRefeshToken = context.Request.Cookies.ContainsKey(nameRefeshToken);
+            if (hasAuthorizationCokie)
+            {
+                context.Response.Cookies.Delete(nameRefeshToken);
+            }
+
+            return Task.FromResult(Result.Ok());
+        }
+        catch (Exception ex)
+        {
+            return Task.FromResult(Result.Error(ex.Message));
+        }
+    }
+    [HttpGet(nameof(GetInfo))]
+    public async Task<ResultOf<ClaimsPrincipal>> GetInfo()
+    {
+        return await Task.FromResult("Only user client side");
+    }
+
+    [HttpGet(nameof(CheckPermistion))]
+    public async Task<Result> CheckPermistion()
+    {
+        return await Task.FromResult("Only user client side");
+    }
+    [HttpGet(nameof(UpdateUser))]
+
+    public async Task<Result> UpdateUser(ResultOf<AuthResponse> authResponse)
+    {
+        return await Task.FromResult("Only user client side");
     }
 }
 

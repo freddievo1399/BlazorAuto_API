@@ -27,8 +27,8 @@ public class EntityProduct : EntityBase
     //[JsonPropertyName("ImageJson")]
     //[JsonData]
     //[NotMapped]
-    public ICollection<ImageInfo> Images { get; set; } = new List<ImageInfo>();
-    public ICollection<ImageInfo> CarouselImages { get; set; } = new List<ImageInfo>();
+    public List<ImageInfo> Images { get; set; } = new List<ImageInfo>();
+    public List<ImageInfo> CarouselImages { get; set; } = new List<ImageInfo>();
 
     [NotMapped]
     public ICollection<EntityCategory> Categories

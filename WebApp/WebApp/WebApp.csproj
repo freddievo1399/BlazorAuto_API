@@ -19,8 +19,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Controller\" />
+		<Folder Include="Interface\" />
 		<Folder Include="Util\" />
-		<Folder Include="wwwroot\Images\" />
 	</ItemGroup>
 
 </Project>

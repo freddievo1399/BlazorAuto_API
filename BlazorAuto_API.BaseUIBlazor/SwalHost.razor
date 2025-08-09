@@ -51,14 +51,12 @@
 
 
 @code {
-	private SfDialog DialogRef;
 	private string Title = "Xác nhận";
 	private string Message = "";
 	private bool IsVisible = false;
 	private bool ShowCancel = true;
 	private SwalType swalType = SwalType.Info;
-	private TaskCompletionSource<SwalResult> tcs;
-	private string UrlGif = "";
+	private TaskCompletionSource<SwalResult>? tcs;
 
 	private string TypeCss => swalType switch
 	{

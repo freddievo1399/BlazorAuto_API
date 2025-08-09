@@ -4,16 +4,16 @@
 @typeparam TValue
 
 <CascadingValue Value="@this">
-    @ChildContent
 </CascadingValue>
 @code {
     [Parameter]
-    [JsonIgnore]
-    public RenderFragment ChildContent { get; set; }
-    [Parameter]
-    public Func<DataManagerRequest, Task<PagedResultsOf<TValue>>> GetDataMethod { get; set; }
+    public Func<DataManagerRequest, Task<PagedResultsOf<TValue>>>? GetDataMethod { get; set; }
     public override async Task<object> ReadAsync(DataManagerRequest dm, string key = null)
     {
+		if (GetDataMethod == null)
+		{
+			throw new InvalidOperationException("GetDataMethod is not set.");
+		}
 		var rsp =  await GetDataMethod(dm);
         return dm.RequiresCounts ? new DataResult() { Result = rsp.Items, Count = rsp.TotalCount } : (object)rsp.Items;
     }

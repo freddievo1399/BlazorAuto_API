@@ -18,8 +18,4 @@
     <ProjectReference Include="..\..\BlazorAuto_API.Customer.Blazor\BlazorAuto_API.Customer.Blazor.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\" />
-  </ItemGroup>
-
 </Project>

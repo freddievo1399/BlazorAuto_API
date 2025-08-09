@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using BlazorAuto_API.Abstract;
 using BlazorAuto_API.Admin.Abstract;
 using BlazorAuto_API.Infrastructure;
-using BlazorAuto_API.Infrastructure.Attributes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,29 +14,13 @@ using Newtonsoft.Json;
 using Syncfusion.Blazor.Data;
 
 namespace BlazorAuto_API.Admin.Server;
+using static BlazorAuto_API.Admin.Abstract.IManagerUser;
 
 [ApiController]
 [Route("/api/admin/[controller]")]
 [ApiExplorerSettings(GroupName = "Admin")]
 public class ManagerUserController : ControllerBase, IManagerUser
 {
-
-    [Feature("Danh mục", "Quản lý danh mục")]
-    public enum PERMISSION
-    {
-        [Permistion("Xem danh sách")]
-        ALLOW_VIEW,
-
-        [Permistion("Thêm")]
-        ALLOW_ADD,
-
-        [Permistion("Sửa")]
-        ALLOW_UPDATE,
-
-        [Permistion("Xóa")]
-        ALLOW_DELETE,
-    }
-
     private readonly IDbContext _DbContext;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
