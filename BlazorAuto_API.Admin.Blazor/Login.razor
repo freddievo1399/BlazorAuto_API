@@ -1,0 +1,55 @@
+﻿@page "/admin/login"
+@layout LoginLayout
+
+@inject IBlazorService<IAuthenticationService> AuthService;
+
+@inject NavigationManager Navigation
+<EditForm Model="@model" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="login-container">
+        <h3>Đăng nhập</h3>
+
+        <div>
+            <label>Tên đăng nhập</label>
+            <InputText @bind-Value="model.UserName" class="form-control" />
+            <ValidationMessage For="@(() => model.UserName)" />
+        </div>
+
+        <div>
+            <label>Mật khẩu</label>
+            <InputText @bind-Value="model.Password" type="password" class="form-control" />
+            <ValidationMessage For="@(() => model.Password)" />
+        </div>
+
+        <div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Đăng nhập</button>
+    </div>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="text-danger">@errorMessage</div>
+}
+
+@code {
+    RequestLogin model = new();
+    private string? errorMessage;
+	private IAuthenticationService Service => AuthService.GetService();
+    private async Task HandleLogin()
+    {
+        var result = await Service.LoginAsync(model);
+        if (result.Success)
+        {
+			AuthService.SetUser(result.Message);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = result.Message;
+        }
+    }
+}

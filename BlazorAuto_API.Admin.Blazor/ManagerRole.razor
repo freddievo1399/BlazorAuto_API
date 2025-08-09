@@ -1,0 +1,37 @@
+﻿@page "/admin/ManagerRole"
+@inject IBlazorService<IManagerRole> ManagerRoleService;
+<PageHeaderContent>
+	<PageHeader PageTitle="Quản lý người dùng" ></PageHeader>
+</PageHeaderContent>
+@* AddEvent="OpenDialogAddUser" *@
+
+<div class="container-fluid row">
+	<div class="col-3">
+		Danh sach phân quyền
+@* 		<SfListBox TValue="Role[]" DataSource="roles" TItem="Role" @bind-Value=roleSelected>
+			<ListBoxFieldSettings Text="RoleName" />
+    <ListBoxSelectionSettings ShowCheckbox="true" ShowSelectAll="true"></ListBoxSelectionSettings>
+</SfListBox>	 *@
+	</div>
+	<div class="col-9">Nội dung phân quyền</div>
+</div>
+
+@code {
+	IManagerRole service => ManagerRoleService.GetService();
+	List<Role> roles = new();
+	Role roleSelected = new();
+	List<string> userNames = [];
+	protected override async Task OnInitializedAsync()
+	{
+		var rpsUsers = await service.GetUsers();
+		if (rpsUsers.Success)
+		{
+			userNames = rpsUsers.Items.ToList();
+		}
+		var rspRoles = await service.GetData();
+		if (rspRoles.Success)
+		{
+			roles = rspRoles.Items.ToList();
+		}
+	}
+}
