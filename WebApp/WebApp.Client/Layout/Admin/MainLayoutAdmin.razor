@@ -1,0 +1,47 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager nav
+@using Syncfusion.Blazor.Buttons
+<div class="container-fluid" onclick="@ToggleDisable">
+	<header class="header">
+		<div class="button-toggle" @onclick:stopPropagation="true">
+			<SfButton IconCss="bi bi-list" OnClick=DrawerToggle />
+		</div>
+		@_headerContentManager.Content
+	</header>
+
+	<SideBar @bind-Open=_drawerOpen></SideBar>
+	<main class="col-auto">
+		<article class="row">
+			<CascadingValue Value="_headerContentManager">
+				@Body
+			</CascadingValue>
+			<SwalHost />
+		</article>
+	</main>
+</div>
+
+<div id="blazor-error-ui">
+	An unhandled error has occurred.
+	<a href="" class="reload">Reload</a>
+	<a class="dismiss">🗙</a>
+</div>
+
+@code {
+	bool _drawerOpen = false;
+	private PageHeaderContentManager _headerContentManager = new();
+	protected override void OnInitialized()
+	{
+	}
+
+	void DrawerToggle(MouseEventArgs args)
+	{
+		_drawerOpen = !_drawerOpen;
+	}
+	void ToggleDisable()
+	{
+		if (_drawerOpen)
+		{
+			_drawerOpen = false;
+		}
+	}
+}

@@ -1,0 +1,23 @@
+﻿<div class="col-auto mr-auto">@PageTitle</div>
+<div class="col-auto">
+	<SfButtonGroup CssClass="e-small">
+		@if (AddEvent.HasDelegate)
+		{
+			<ButtonGroupButton IconCss="bi bi-plus-lg" CssClass=" e-primary" @onclick=AddEvent></ButtonGroupButton>
+		}
+		@if (RefeshEvent.HasDelegate)
+		{
+			<ButtonGroupButton IconCss="bi bi-arrow-clockwise" CssClass=" e-info" @onclick=RefeshEvent></ButtonGroupButton>
+		}
+	</SfButtonGroup>
+</div>
+
+@code {
+	[Parameter]
+	public string PageTitle { get; set; } = "";
+	[Parameter]
+	public EventCallback AddEvent { get; set; }
+	[Parameter]
+	public EventCallback RefeshEvent { get; set; }
+	[Parameter] public RenderFragment? Body { get; set; }
+}

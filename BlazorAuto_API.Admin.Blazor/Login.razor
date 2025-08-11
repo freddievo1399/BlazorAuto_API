@@ -1,0 +1,62 @@
+﻿@page "/admin/login"
+
+
+@using Microsoft.AspNetCore.Components.Forms
+@layout LoginLayout
+@inject IAuthentication AuthService;
+@inject SwalService swal
+@inject NavigationManager Navigation
+
+
+<EditForm Model="@model" OnValidSubmit="HandleLogin">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<div class="login-container">
+		<h3>Đăng nhập</h3>
+
+		<div>
+			<label>Tên đăng nhập</label>
+			<InputText @bind-Value="model.UserName" class="form-control" />
+			<ValidationMessage For="@(() => model.UserName)" />
+		</div>
+
+		<div>
+			<label>Mật khẩu</label>
+			<InputText @bind-Value="model.Password" type="password" class="form-control" />
+			<ValidationMessage For="@(() => model.Password)" />
+		</div>
+
+		<div>
+		</div>
+
+		<button type="submit" class="btn btn-primary">Đăng nhập</button>
+	</div>
+</EditForm>
+
+
+@code {
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public string? UrlNavigation { get; set; }
+	RequestLogin model = new();
+	private async Task HandleLogin()
+	{
+		var result = await AuthService.LoginAsync(model);
+		if (result.Success)
+		{
+			if (!string.IsNullOrEmpty(UrlNavigation))
+			{
+				Navigation.NavigateTo(Uri.UnescapeDataString(UrlNavigation));
+			}
+			else
+			{
+				Navigation.NavigateTo("/admin", true);
+			}
+		}
+		else
+		{
+			await swal.Error(result.Message);
+		}
+	}
+}

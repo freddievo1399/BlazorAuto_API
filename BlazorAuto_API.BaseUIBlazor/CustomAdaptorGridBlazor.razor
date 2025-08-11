@@ -1,0 +1,20 @@
+﻿@using Newtonsoft.Json
+@using Syncfusion.Blazor.Data
+@inherits DataAdaptor
+@typeparam TValue
+
+<CascadingValue Value="@this">
+</CascadingValue>
+@code {
+    [Parameter]
+    public Func<DataManagerRequest, Task<PagedResultsOf<TValue>>>? GetDataMethod { get; set; }
+    public override async Task<object> ReadAsync(DataManagerRequest dm, string key = null)
+    {
+		if (GetDataMethod == null)
+		{
+			throw new InvalidOperationException("GetDataMethod is not set.");
+		}
+		var rsp =  await GetDataMethod(dm);
+        return dm.RequiresCounts ? new DataResult() { Result = rsp.Items, Count = rsp.TotalCount } : (object)rsp.Items;
+    }
+}

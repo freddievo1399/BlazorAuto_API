@@ -1,0 +1,342 @@
+﻿@page "/admin/product/{Guid:guid}"
+
+@using Syncfusion.Blazor.ImageEditor
+@inject NavigationManager NavigationManager
+@inject SwalService Swal
+@inject IJSRuntime JS
+@inject IBlazorService<IProductDetailService> ProductService;
+@inject HttpClient httpClient
+<PageHeaderContent>
+	<PageHeader PageTitle="Cấu hình sản phẩm"></PageHeader>
+</PageHeaderContent>
+<EditForm id="formsubmit" Model=ProductModel OnValidSubmit="OnValidSubmit">
+	<DataAnnotationsValidator />
+	<SfTextBox @bind-Value="ProductModel.Name" Placeholder="Tên" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+	<SfTextBox @bind-Value="ProductModel.Description" Placeholder="Mô tả" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+	<div class="Upload-Range">
+		<div class="Upload-Label">
+			Kéo ảnh vào
+		</div>
+		<InputFile OnChange="HandleFileSelected" accept="image/*" multiple class="Upload-Input" />
+	</div>
+	<div class="row">
+		<SfGrid @ref=grid DataSource=ProductModel.ProductSpecifications AutoFit EnableAutoFill AllowPaging="true" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Update", "Cancel" })">
+			<GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" AllowEditOnDblClick></GridEditSettings>
+		</SfGrid>
+	</div>
+	<div class="row">
+		<div class="col-12">
+			<SfButton OnClick="DialogManagerImages">Quản lý ảnh tổng (@(ProductModel.ImageInfos.Count) ảnh)</SfButton>
+			<SfButton OnClick="DialogManagerCarouselImages">Quản lý ảnh Caroucel (@(ProductModel.CarouselImages.Count) ảnh)</SfButton>
+			<SfButton OnClick="DialogManagerRichTextImages">Thêm ảnh vào vào mô tả</SfButton>
+		</div>
+	</div>
+	<RichTextEditorCustomer @ref=richTextEditor @bind-Value="ProductModel.RichDescription"></RichTextEditorCustomer>
+	<SfMultiSelect @bind-Value="ProductModel.CategoryGuids" Placeholder="Chọn danh mục" DataSource="@Categories">
+		<MultiSelectFieldSettings Value="Guid" Text="Name"></MultiSelectFieldSettings>
+	</SfMultiSelect>
+</EditForm>
+
+
+<SfDialog @ref=sfDialogImage Target="#target" ShowCloseIcon="true" Visible=false>
+	<DialogTemplates>
+		<Header> @nameDialog </Header>
+		<Content>
+			<div class="container">
+				<div class="row">
+					@foreach (var img in DataImages)
+					{
+						var imgTemp = img;
+						<div class="col-3" @onclick="@(()=>imgTemp.Selected=!imgTemp.Selected)">
+							<img src="@($"{imgTemp.Src}?{DateTime.Now}")" />
+							<div class="top-right-overlay" @onclick:stopPropagation>
+								<SfCheckBox @bind-Checked=imgTemp.Selected> </SfCheckBox>
+							</div>
+							<div class="bot-center-overlay" @onclick:stopPropagation>
+								<SfButton OnClick="(()=>EditImage(imgTemp))">Chỉnh sửa hình ảnh</SfButton>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</Content>
+	</DialogTemplates>
+	<DialogButtons>
+		<DialogButton IsPrimary="true" OnClick="@(()=>ActionbuttionDialog!.Invoke())">
+			@nameFuncDialog
+		</DialogButton>
+	</DialogButtons>
+	<DialogEvents OnClose="LoseDialog"></DialogEvents>
+</SfDialog>
+
+@if (ImageEditing != null)
+{
+	<div class="overlay-fullsreen container">
+		<div class="d-flex justify-content-between">
+			<div class="col-auto"></div>
+			<div class="col-auto mr-auto">Chỉnh sửa ảnh</div>
+			<div class="col-auto">
+				<SfButton OnClick="UpdateImage">Cập nhật ảnh</SfButton>
+				<SfButton OnClick="@(()=>{ ImageEditing = null;ImageEditor=null; })">Đóng</SfButton>
+			</div>
+		</div>
+		<div class="row imageEditer">
+			<SfImageEditor @ref="ImageEditor" AllowUndoRedo Toolbar="customToolbarItem">
+				<ImageEditorEvents Created="LoadImage"></ImageEditorEvents>
+				<ImageEditorUploadSettings></ImageEditorUploadSettings>
+			</SfImageEditor>
+		</div>
+	</div>
+}
+
+
+
+
+
+<SfButton HtmlAttributes="@(new Dictionary<string, object> { { "type", "submit" },{"form","formsubmit"} })">Áp dụng</SfButton>
+
+@code {
+	RichTextEditorCustomer? richTextEditor;
+	private string AllowedExtensions { get; set; } = ".jpeg, .jpg";
+	private double MinSize { get; set; } = 1 * 1024; //1kb
+	private double MaxSize { get; set; } = 100 * 1024; //100kb
+	SfGrid<ProductSpecificationModel>? grid;
+	[Parameter]
+	public Guid Guid { get; set; }
+
+
+	public List<CategoriesInfoModel>? Categories { get; set; } = null;
+
+	public ProductSpecificationModel ModelNewSpecification { get; set; } = new();
+
+
+	private ProductDetailModel ProductModel = new();
+	protected override async void OnInitialized()
+	{
+		await Swal.Loading("Đang load");
+	}
+	override protected async Task OnInitializedAsync()
+	{
+		var rspProduct = await ProductService.Excute(service => service.FindByGuid(Guid));
+		if (!rspProduct.Success)
+		{
+			return;
+		}
+		ProductModel = rspProduct.Item;
+		var rspCatelory = await ProductService.Excute(service => service.GetListCategory());
+		if (!rspCatelory.Success)
+		{
+			await Swal.Error($"Load thất bại danh mục: {rspCatelory.Message}");
+		}
+		else
+		{
+			Categories = rspCatelory.Items.ToList();
+		}
+		await Swal.Close();
+
+		StateHasChanged();
+	}
+
+
+	#region Edit image
+	SfImageEditor? ImageEditor { get; set; }
+	private ImageInfoRes? ImageEditing;
+	private List<ImageEditorToolbarItemModel> customToolbarItem = new()
+
+	{
+		new ImageEditorToolbarItemModel { Name = "Zoom", },
+		new ImageEditorToolbarItemModel { Name = "Crop" },
+		new ImageEditorToolbarItemModel { Name = "Annotation", Disabled = true },
+		new ImageEditorToolbarItemModel { Name = "Finetune", Disabled = true },
+		new ImageEditorToolbarItemModel { Name = "Filter" },
+		new ImageEditorToolbarItemModel { Name = "Confirm" },
+		// new ImageEditorToolbarItemModel { Name = "Reset" },
+		new ImageEditorToolbarItemModel { Name = "Save" }
+	};
+
+	private async Task LoadImage()
+	{
+		await ImageEditor!.OpenAsync(ImageEditing!.Src);
+	}
+	private async Task UpdateImage()
+	{
+		var imageDataUrl = await ImageEditor!.GetImageDataUrlAsync();
+		if (!string.IsNullOrEmpty(imageDataUrl))
+		{
+			int base64Index = imageDataUrl.IndexOf(',') + 1;
+			var base64String = imageDataUrl.Substring(base64Index);
+			var bytes = Convert.FromBase64String(base64String);
+			using (var multipartContent = new MultipartFormDataContent())
+			{
+				using (var memorydata = new MemoryStream(bytes))
+				{
+
+					multipartContent.Add(new StreamContent(memorydata), "UploadFile", ImageEditing!.FileName!);
+					var uploadRsp = await httpClient.PostAsync($"/api/admin/ProductDetail/UpdateImage?Guid={Guid}&GuidImage={ImageEditing.Guid}",
+						multipartContent);
+					var result = await uploadRsp.GetResultAsync();
+					if (result.Success)
+					{
+						await Swal.Success("OK");
+					}
+					else
+					{
+						await Swal.Error(result.Message);
+
+					}
+				}
+			}
+		}
+		// if (!string.IsNullOrEmpty(imageDataUrl))
+		// {
+		// 	int base64Index = imageDataUrl.IndexOf(',') + 1;
+		// 	var base64String = imageDataUrl.Substring(base64Index);
+		// 	await JS.InvokeVoidAsync("SaveAs", $"file.webp", base64String);
+		// }
+		Console.WriteLine();
+	}
+	private async Task EditImage(ImageInfoRes imageInfoRes)
+	{
+		ImageEditing = imageInfoRes;
+		await InvokeAsync(StateHasChanged);
+	}
+	#endregion
+
+	private async Task OnValidSubmit()
+	{
+		var abc = grid!.IsEdit;
+		if (grid.IsEdit)
+		{
+			await Swal.Error("Danh sách hàng hóa chưa được chỉnh");
+			return;
+		}
+		await Swal.Loading("Vui lòng đợi");
+		var rsp = await ProductService.Excute(service => service.Update(ProductModel));
+		if (rsp.Success)
+		{
+			await Swal.Close();
+		}
+		else
+		{
+			await Swal.Warning(rsp.Message);
+		}
+	}
+
+	#region  manager image
+	SfDialog? sfDialogImage;
+	string nameFuncDialog = "DialogAddImage";
+	string nameDialog = "DialogAddImage";
+	Func<Task>? ActionbuttionDialog;
+	private List<ImageInfoRes> DataImages = new();
+
+	private async Task HandleFileSelected(InputFileChangeEventArgs e)
+	{
+		var Files = e.GetMultipleFiles(e.FileCount);
+		int take = 5,
+			skip = 0;
+		while (Files.Count - skip > 0)
+		{
+			var fileChunk = Files.Skip(skip).Take(take).ToList();
+			skip += take;
+			var multiPartContent = fileChunk.GetMultipartFormDataContent("UploadFiles");
+			var uploadRsp = await httpClient.PostAsync($"/api/admin/ProductDetail/UploadImage?Guid={Guid}",
+				multiPartContent);
+		}
+		var rspProduct = await ProductService.Excute(service => service.FindByGuid(Guid));
+		if (!rspProduct.Success)
+		{
+			//log ra
+		}
+		ProductModel = rspProduct.Item;
+	}
+
+	private void LoseDialog()
+	{
+		DataImages.Clear();
+	}
+	private async Task DialogManagerImages()
+	{
+		nameDialog = "Quản lý ảnh";
+		nameFuncDialog = "Xóa hình ảnh";
+		ActionbuttionDialog = RemoveImages;
+		DataImages.AddRange(ProductModel?.ImageInfos?.Select(x => new ImageInfoRes()
+			{
+				FileName = x.FileName,
+				Guid = x.Guid,
+				Selected = false,
+				Src = x.Src
+			}).ToList() ?? new());
+		await sfDialogImage!.ShowAsync();
+	}
+	private async Task DialogManagerCarouselImages()
+	{
+		nameDialog = "Quản lý ảnh carousel";
+		nameFuncDialog = "Áp dụng";
+		ActionbuttionDialog = ApplyCarousel;
+		DataImages.AddRange(ProductModel?.ImageInfos?.Select(x => new ImageInfoRes()
+			{
+				FileName = x.FileName,
+				Guid = x.Guid,
+				Selected = ProductModel?.CarouselImages.Any(crs => crs.Guid == x.Guid) ?? false,
+				Src = x.Src
+			}).ToList() ?? new());
+		await sfDialogImage!.ShowAsync();
+	}
+	private async Task DialogManagerRichTextImages()
+	{
+		nameDialog = "Thêm ảnh vào mô tả";
+		nameFuncDialog = "Thêm";
+		ActionbuttionDialog = AddImageToRichText;
+		DataImages.AddRange(ProductModel?.ImageInfos?.Select(x => new ImageInfoRes()
+			{
+				FileName = x.FileName,
+				Guid = x.Guid,
+				Selected = false,
+				Src = x.Src
+			}).ToList() ?? new());
+		await sfDialogImage!.ShowAsync();
+	}
+
+	private async Task RemoveImages()
+	{
+		await Swal.Loading("Cập nhập");
+		var imageDeletes = DataImages.Where(x => x.Selected).ToList();
+		var rsp = await ProductService.Excute(service => service.RemoveImage(new()
+			{
+				Guid = Guid,
+				GuidImage = imageDeletes.Select(x => x.Guid).ToList()
+			}));
+		if (rsp.Success)
+		{
+			ProductModel.ImageInfos = ProductModel.ImageInfos.Where(x => !imageDeletes.Any(delete => delete.Guid == x.Guid)).ToList();
+			ProductModel.CarouselImages = ProductModel.CarouselImages.Where(x => !imageDeletes.Any(delete => delete.Guid == x.Guid)).ToList();
+			await sfDialogImage!.HideAsync();
+			await Swal.Close();
+
+		}
+		else
+		{
+			await Swal.Warning(rsp.Message);
+		}
+	}
+	private async Task ApplyCarousel()
+	{
+		await Swal.Loading("Cập nhập");
+		ProductModel.CarouselImages = DataImages.Where(x => x.Selected).ToList();
+		await sfDialogImage!.HideAsync();
+		await Swal.Close();
+	}
+	private async Task AddImageToRichText()
+	{
+		await Swal.Loading("Cập nhập");
+		var images = DataImages.Where(x => x.Selected).ToList();
+		foreach (var image in images)
+		{
+			await richTextEditor!.AddMediaAsync(image.Src, "img");
+		}
+		await sfDialogImage!.HideAsync();
+		await Swal.Close();
+	}
+	#endregion
+}
+

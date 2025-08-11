@@ -37,28 +37,27 @@ namespace BlazorAuto_API.Abstract
 
         private async Task EnsureReady()
         {
-            // Đợi tối đa 1 giây nếu OnShow chưa được gán
             int retry = 0;
             while (OnShow == null && retry++ < 10)
                 await Task.Delay(100);
         }
 
-        public Task<SwalResult> Confirm(string title, string message, bool showCancel = true)
+        public Task<SwalResult> Confirm(string message, string title = "Xác nhận", bool showCancel = true)
             => Show(title, message, SwalType.Confirm, showCancel);
 
-        public Task<SwalResult> Info(string title, string message)
+        public Task<SwalResult> Info(string message, string title = "Thông báo")
             => Show(title, message, SwalType.Info);
 
-        public Task<SwalResult> Warning(string title, string message)
+        public Task<SwalResult> Warning(string message, string title = "Cảnh báo")
             => Show(title, message, SwalType.Warning);
 
-        public Task<SwalResult> Success(string title, string message)
+        public Task<SwalResult> Success(string message, string title = "Thành công")
             => Show(title, message, SwalType.Success);
 
-        public Task<SwalResult> Error(string title, string message)
+        public Task<SwalResult> Error(string message, string title = "Báo lỗi")
             => Show(title, message, SwalType.Error);
 
-        public Task<SwalResult> Loading(string title = "Đang xử lý...", string message = "")
+        public Task<SwalResult> Loading(string message = "", string title = "Đang xử lý...")
             => Show(title, message, SwalType.Loadding, false);
 
         public Task<SwalResult> Close()

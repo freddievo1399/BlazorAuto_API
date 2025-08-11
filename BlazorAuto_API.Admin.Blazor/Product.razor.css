@@ -1,0 +1,87 @@
+﻿.container {
+    height: 400px;
+    overflow-y: auto;
+}
+
+.carousel {
+    height: 200px;
+}
+
+.container .col-3 {
+    position: relative;
+    padding: 2px;
+    background: #229e30;
+}
+
+.row img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain
+}
+
+.top-right-overlay {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 1;
+}
+
+.bot-center-overlay {
+    position: absolute;
+    bottom: 5px; /* Khoảng cách từ dưới lên */
+    left: 50%; /* Đặt tâm phần tử theo chiều ngang */
+    transform: translateX(-50%); /* Căn giữa theo chiều ngang */
+    z-index: 1;
+}
+
+.overlay-fullsreen {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    z-index: 10003;
+    background-color: white;
+}
+
+    .overlay-fullsreen.invisible {
+        display: none;
+    }
+
+.imageEditer {
+    height: 100%;
+}
+
+.Upload-Range {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 100px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+    .Upload-Range .Upload-Label {
+        position: absolute;
+        top: 0px;
+        /*background-color: aqua;*/
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: url("https://th.bing.com/th/id/OIP.E9F2Cdo631hrnOc506umlwHaHa?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .Upload-Range ::deep .Upload-Input {
+        opacity: 0;
+        position: absolute;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+    }

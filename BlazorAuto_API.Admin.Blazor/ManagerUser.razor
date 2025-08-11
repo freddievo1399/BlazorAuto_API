@@ -1,0 +1,91 @@
+﻿@page "/admin/ManagerUser"
+@inject IBlazorService<IManagerUser> ManagerUserService;
+<PageHeaderContent>
+	<PageHeader PageTitle="Quản lý người dùng" RefeshEvent=@(async ()=>await grid.Refresh()) AddEvent="OpenDialogAddUser"></PageHeader>
+</PageHeaderContent>
+
+
+<SfGrid @ref=grid TValue="UserInfoModel">
+	<SfDataManager Adaptor="Adaptors.CustomAdaptor">
+		<CustomAdaptorGridBlazor GetDataMethod="GetData"/>
+	</SfDataManager>
+</SfGrid>
+@* 	<GridColumns>
+		<GridColumn Field="@(nameof(ProductInfoModel.Name))"></GridColumn>
+		<GridColumn Field="@(nameof(ProductInfoModel.Description))"></GridColumn>
+		<GridColumn HeaderText="Func" TextAlign="TextAlign.Right" Width="100">
+			<Template>
+				@{
+					var product = (context as ProductInfoModel);
+					<SfDropDownButton IconCss="e-message" CssClass="DropdownFunction">
+						<DropDownMenuItems>
+							<DropDownButtonEvents ItemSelected="Grid_SelectedTask"></DropDownButtonEvents>
+							<DropDownMenuItem Id="@($"Grid_Edit|{product!.Guid}")" Text="Chỉnh sửa"></DropDownMenuItem>
+							<DropDownMenuItem Id="@($"Grid_Delete|{product!.Guid}")" Text="Xóa"></DropDownMenuItem>
+						</DropDownMenuItems>
+					</SfDropDownButton>
+				}
+			</Template>
+		</GridColumn>
+
+	</GridColumns> *@
+<SfDialog @ref=DialogAddUser Width="250px" Visible=false AllowDragging="true" ShowCloseIcon="true">
+	<DialogTemplates>
+		<Header> Tạo hàng hóa</Header>
+		<Content>
+			<EditForm id="formsubmit" Model=userCreateModel OnValidSubmit="OnValidSubmit">
+				<DataAnnotationsValidator />
+				<SfTextBox @bind-Value="userCreateModel!.UserName" Placeholder="Tên đang nhập" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+				<ValidationMessage For="@(()=>userCreateModel.UserName)"></ValidationMessage>
+				<SfTextBox @bind-Value="userCreateModel.FullName" Placeholder="Tên" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+				<ValidationMessage For="@(()=>userCreateModel.FullName)"></ValidationMessage>
+				<SfTextBox @bind-Value="userCreateModel.Password" Type="InputType.Password" Placeholder="Nhập mật khẩu" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+				<ValidationMessage For="@(()=>userCreateModel.Password)"></ValidationMessage>
+				<SfTextBox @bind-Value="userCreateModel.PasswordVerify" Type="InputType.Password" Placeholder="Nhập lại mật khẩu" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+				<ValidationMessage For="@(()=>userCreateModel.PasswordVerify)"></ValidationMessage>
+			</EditForm>
+		</Content>
+	</DialogTemplates>
+	<DialogButtons>
+		<DialogButton Type="ButtonType.Submit"  HtmlAttributes="@(new Dictionary<string, object> {{"form","formsubmit"} })">OK</DialogButton>
+		<DialogButton Content="Cancel" OnClick=@(()=>DialogAddUser.HideAsync()) />
+	</DialogButtons>
+</SfDialog>
+@code {
+	SfDialog DialogAddUser = new();
+	private SfGrid<UserInfoModel> grid = new();
+	UserCreateModel? userCreateModel;
+	private async Task OpenDialogAddUser()
+	{
+		userCreateModel = new();
+		await DialogAddUser.ShowAsync();
+	}
+	private async Task OnValidSubmit()
+	{
+		if (userCreateModel is null)
+			return;
+		if (userCreateModel.Password != userCreateModel.PasswordVerify)
+		{
+			await Swal.Error( "Pass không trùng");
+			return;
+		}
+		await Swal.Loading("Đang sử lý");
+		var rsp = await ManagerUserService.Excute(service=> service.CreateUser(userCreateModel));
+		if (rsp.Success)
+		{
+			await Swal.Success("Thành công");
+			await DialogAddUser.HideAsync();
+			await grid.Refresh();
+			userCreateModel = null;
+		}
+		else
+		{
+			await Swal.Error(rsp.Message);
+		}
+	}
+	private async Task<PagedResultsOf<UserInfoModel>> GetData(DataManagerRequest request)
+	{
+		var rsp = await ManagerUserService.Excute(service=> service.GetAllUsersAsync(request));
+		return rsp;
+	}
+}

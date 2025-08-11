@@ -1,0 +1,12 @@
+main{
+   min-height:100vh;
+}
+.button-toggle {
+    display:flex;
+}
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}

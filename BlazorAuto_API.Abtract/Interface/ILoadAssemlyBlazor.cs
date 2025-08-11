@@ -9,6 +9,6 @@ namespace WebApp.Abstract
 {
     public interface ILoadAssemlyBlazor
     {
-        public List<Assembly> LoadAssemblyAsync();
+        public List<Assembly> LoadAllAssembly();
     }
 }

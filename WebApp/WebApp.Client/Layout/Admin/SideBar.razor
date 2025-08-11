@@ -1,0 +1,30 @@
+﻿@if (Open)
+{
+	<nav class="sidebar col-auto" @onclick:stopPropagation="true">
+
+		<h3 class="px-4">Admin</h3>
+		<div class="nav-item px-3">
+			<NavLink Match="NavLinkMatch.Prefix" href="/admin/categorie">Categorie</NavLink>
+		</div>
+
+		<div class="nav-item px-3">
+			<NavLink Match="NavLinkMatch.Prefix" href="/admin/product">Product</NavLink>
+		</div>
+
+		<div class="nav-item px-3">
+			<NavLink Match="NavLinkMatch.Prefix" href="admin/ManagerUser">ManagerUser</NavLink>
+		</div>
+
+		<div class="nav-item px-3">
+			<NavLink Match="NavLinkMatch.Prefix" href="admin/ManagerRole">ManagerRole</NavLink>
+		</div>
+		
+	</nav>
+}
+
+@code {
+	[Parameter]
+	public bool Open { get; set; }
+	[Parameter]
+	public EventCallback<bool> OpenChanged { get; set; }
+}

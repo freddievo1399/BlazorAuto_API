@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+
+namespace BlazorAuto_API.Infrastructure
+{
+    public class ApplicationUser : IdentityUser
+    {
+        public string? FullName { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public string? Gender { get; set; }
+        public string? Address { get; set; }
+        public string? AvatarUrl { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public string? CreateUserId { get; set; } = "";
+        public DateTime? RemovedAt { get; set; }
+        public string? RemovedUserId { get; set; }
+
+        public virtual ICollection<EntityRefreshTokenEntityBase> RefreshTokens { get; set; } = new List<EntityRefreshTokenEntityBase>();
+    }
+}

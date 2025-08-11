@@ -1,20 +1,23 @@
-﻿@using ComputerStore.Abtract
-@using Syncfusion.Blazor.RichTextEditor
+﻿@using Syncfusion.Blazor.RichTextEditor
 
-<SfRichTextEditor EnableAutoUrl @ref="sfRichTextEditor" onmouseup="Onclick" Readonly="IsViewer">
-    <RichTextEditorToolbarSettings Type="ToolbarType.MultiRow" Items="Items" Enable="!IsViewer" />
-    <RichTextEditorImageSettings Display="ImageDisplay.Break" ResizeByPercent  >
-        
-    </RichTextEditorImageSettings>
-    <p>Rich Text Editor allows to insert images from online source as well as local computer where you want to insert the image in your content.</p>
-    <p><b>Get started Quick Toolbar to click on the image</b></p>
-    <p>It is possible to add custom style on the selected image inside the Rich Text Editor through quick toolbar.</p>
+<SfRichTextEditor EnableAutoUrl EditorMode="EditorMode.HTML" ShowTooltip  Value=@Value ValueChanged="@ValueChanged" @ref="sfRichTextEditor">
+    <RichTextEditorToolbarSettings Type="ToolbarType.MultiRow" Items="Items"/>
+    <RichTextEditorImageSettings Display="ImageDisplay.Break" ResizeByPercent/>
 </SfRichTextEditor>
 @code {
     [Parameter]
     public bool IsViewer { get; set; } = false;
 
-    SfRichTextEditor sfRichTextEditor;
+    [Parameter]
+    public EventCallback<bool> IsViewerChanged { get; set; }
+
+
+    SfRichTextEditor sfRichTextEditor=new();
+    [Parameter]
+    public string Value { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
     private List<ToolbarItemModel> Items = new List<ToolbarItemModel>()
 {
     // --- Nhóm: Định dạng văn bản cơ bản ---
@@ -71,8 +74,7 @@
     new ToolbarItemModel() { Command = ToolbarCommand.Redo },
     new ToolbarItemModel() { Command = ToolbarCommand.SourceCode },
     new ToolbarItemModel() { Command = ToolbarCommand.FullScreen },
-    new ToolbarItemModel() { Command = ToolbarCommand.Maximize },
-    new ToolbarItemModel() { Command = ToolbarCommand.Minimize },
+
 };
 
     public async Task<Result> AddMediaAsync(string mediaUrl, string mediaType)
@@ -100,5 +102,4 @@
             return ex.Message;
         }
     }
-
 }
