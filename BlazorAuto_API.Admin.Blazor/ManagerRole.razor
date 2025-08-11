@@ -1,66 +1,127 @@
 ﻿@page "/admin/ManagerRole"
+@using Syncfusion.Blazor.Navigations
+@inject SwalService Swal
 @inject IBlazorService<IManagerRole> ManagerRoleService;
 @inject IJSRuntime JSRuntime;
 <PageHeaderContent>
-	<PageHeader PageTitle="Quản lý người dùng"></PageHeader>
+	<PageHeader PageTitle="Quản lý người dùng" AddEvent="AddEvent" RefeshEvent="LoadData"></PageHeader>
 </PageHeaderContent>
-@* AddEvent="OpenDialogAddUser" *@
-
+<SfDialog Visible=false @ref=_dialogAddRole Width="450px" AllowDragging="true" Header="Thông tin phân quyền" ShowCloseIcon>
+	<div class="row">
+		<SfTextBox @bind-Value="RoleName" ValidateOnInput Placeholder="Tên phân quyền" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+	</div>
+	<div class="row">
+		<SfButton CssClass="mx-auto" IconCss="bi bi-floppy" OnClick="OnValidSubmit">Lưu</SfButton>
+	</div>
+</SfDialog>
 <div class="container-fluid row">
 	<div class="col-3">
-		<div class="row">Các phân quyền</div>
+		<div class="row">
+			<div class="col-auto">Các phân quyền</div>
+			<SfButton CssClass="col-auto ms-auto" IconCss="bi bi-plus-lg" OnClick="AddEvent"></SfButton>
+		</div>
 		@for (int i = 0; i < roles.Count; i++)
 		{
 			var index = i;
-			<div class="row" @onclick="@(()=>selectRole(index))">@roles[index].RoleName</div>
+			<div class="row  @(index==SelectedIndex?"selectedRole":"")" @onclick="@(()=>selectRole(index))">
+				<div class="col-auto">@roles[index].RoleName</div>
+				<SfButton CssClass="col-auto ms-auto" IconCss="bi bi-trash3" OnClick="@(()=>DeleteRoleByName(roles[index].RoleName))"></SfButton>
+			</div>
 		}
 	</div>
-	<div class="col-9">
-		<div class="row">Nội dung phân quyền</div>
-		<div class="row">
-			@RoleSelected.RoleName
+	<div class=" col-9">
+		<div class="row d-flex justify-content-between">
+			<div class="col-auto" />
+			<div class="col-auto">
+				@RoleSelected.RoleName
+			</div>
+			<div class="col-auto">
+				<SfButton CssClass="col-auto" IconCss="bi bi-floppy" OnClick="SaveRole"></SfButton>
+			</div>
 		</div>
-		@foreach (var group in Features.GroupBy(x => x.Group))
-		{
-			@group.Key
-			@foreach (var feature in group)
-			{
-				<div class="row">
-					<div class="row">
-						@feature.NameVi
-					</div>
-					@foreach (var permistion in feature.permistionModels)
-					{
-						<SfCheckBox @bind-Checked=permistion.IsChecked Label="@permistion.NameVi"></SfCheckBox>
-					}
-				</div>
-			}
-		}
+		<SfTab>
+			<TabAnimationSettings>
+				<TabAnimationPrevious Effect="Syncfusion.Blazor.AnimationEffect.None"></TabAnimationPrevious>
+				<TabAnimationNext Effect="Syncfusion.Blazor.AnimationEffect.None"></TabAnimationNext>
+			</TabAnimationSettings>
+			<TabItems>
+				<TabItem>
+					<ChildContent>
+						<TabHeader Text="Nội dung phân quyền"></TabHeader>
+					</ChildContent>
+					<ContentTemplate>
+						<SfAccordion>
+							<AccordionItems>
+								@foreach (var group in Features.GroupBy(x => x.Group))
+								{
+									<AccordionItem Expanded="true">
+										<HeaderTemplate>@group.Key</HeaderTemplate>
+										<ContentTemplate>
+											<SfAccordion>
+												<AccordionItems>
+													@foreach (var feature in group)
+													{
+														<AccordionItem Expanded="true">
+															<HeaderTemplate>@feature.NameVi</HeaderTemplate>
+															<ContentTemplate>
+																<div class="row">
+																	@foreach (var permistion in feature.permistionModels)
+																	{
+																		<SfCheckBox CssClass="col" @bind-Checked=permistion.IsChecked Label="@permistion.NameVi"></SfCheckBox>
+																	}
+																</div>
+															</ContentTemplate>
+														</AccordionItem>
+													}
+												</AccordionItems>
+											</SfAccordion>
+										</ContentTemplate>
+									</AccordionItem>
+								}
+							</AccordionItems>
+						</SfAccordion>
+					</ContentTemplate>
+				</TabItem>
+				<TabItem>
+					<ChildContent>
+						<TabHeader Text="Người dùng áp dụng"></TabHeader>
+					</ChildContent>
+					<ContentTemplate>
+						@foreach (var user in Users)
+						{
+							var key = user.Key;
+							<SfCheckBox CssClass="col-4" Label="@key" @bind-Checked=Users[key]></SfCheckBox>
+						}
+					</ContentTemplate>
+				</TabItem>
+			</TabItems>
+		</SfTab>
 	</div>
 </div>
 
 @code {
+	string RoleName = "";
+	SfDialog? _dialogAddRole;
 	List<Role> roles = new();
 	int SelectedIndex = 0;
 	Role RoleSelected => roles.Count != 0 ? roles[SelectedIndex] : new();
-	List<string> userNames = [];
+	Dictionary<string, bool> Users = [];
 	List<FeaturesModel> Features = new();
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
 			await LoadData();
-			UpdateFeature();
-
 		}
 		StateHasChanged();
 	}
 	private async Task LoadData()
 	{
+		await Swal.Loading("Nạp lại dữ liệu");
 		var rpsUsers = await ManagerRoleService.Excute(service => service.GetUsers());
 		if (rpsUsers.Success)
 		{
-			userNames = rpsUsers.Items.ToList();
+			Users = rpsUsers.Items.ToDictionary(x => x, x => false);
 		}
 		var rspRoles = await ManagerRoleService.Excute(service => service.GetData());
 		if (rspRoles.Success)
@@ -72,6 +133,9 @@
 		{
 			Features = rspFeature.Items.ToList();
 		}
+		UpdateFeature();
+
+		await Swal.Close();
 		StateHasChanged();
 	}
 	private void UpdateFeature()
@@ -85,11 +149,68 @@
 				permistion.IsChecked = ClaimsPrincipalUltil.HasPermisson(permistionTotal.PermissionValue, permistion.Value);
 			}
 		}
+		foreach (var user in Users)
+		{
+			Users[user.Key] = role.UserNames.Contains(user.Key);
+		}
 	}
 	void selectRole(int selectedIndex)
 	{
 		SelectedIndex = selectedIndex;
 		UpdateFeature();
 		StateHasChanged();
+	}
+	private async Task AddEvent()
+	{
+		RoleName = "";
+		await _dialogAddRole!.ShowAsync();
+	}
+	private async Task SaveRole()
+	{
+		await Swal.Loading("Vui lòng đợi");
+		RoleSelected.UserNames = Users.Where(x => x.Value).Select(x => x.Key).ToList();
+		var rsp = await ManagerRoleService.Excute(service => service.UpdateRole(RoleSelected));
+		if (rsp.Success)
+		{
+			await LoadData();
+			await _dialogAddRole!.HideAsync();
+			await Swal.Close();
+		}
+		else
+		{
+			await Swal.Warning(rsp.Message);
+		}
+	}
+	private async Task OnValidSubmit()
+	{
+		await Swal.Loading("Vui lòng đợi");
+		var rsp = await ManagerRoleService.Excute(service => service.AddRole(RoleName));
+
+		if (rsp.Success)
+		{
+			await LoadData();
+			await _dialogAddRole!.HideAsync();
+			await Swal.Close();
+		}
+		else
+		{
+			await Swal.Warning(rsp.Message);
+		}
+	}
+	private async Task DeleteRoleByName(string NameRole)
+	{
+		await Swal.Loading("Vui lòng đợi");
+		var rsp = await ManagerRoleService.Excute(service => service.RemoveRole(NameRole));
+		SelectedIndex = 0;
+		if (rsp.Success)
+		{
+			await LoadData();
+			await _dialogAddRole!.HideAsync();
+			await Swal.Close();
+		}
+		else
+		{
+			await Swal.Warning(rsp.Message);
+		}
 	}
 }

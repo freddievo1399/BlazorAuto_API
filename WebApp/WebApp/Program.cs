@@ -54,8 +54,8 @@ builder.Services.AddScoped<ILoadAssemlyBlazor, LazyMode>();
 builder.Services.AddScoped(typeof(IBlazorService<>), typeof(BlazorService<>));
 builder.Services.AddScoped<SwalService>();
 builder.Services.AddScoped<IDbContext, DbConnectionProvider>();
-builder.Services.AddScoped<IAuthenticationForServer, IAuthenticationForServerService>();
-builder.Services.AddScoped<IAuthentication, AuthenticationForServerService>();
+builder.Services.AddScoped<IAuthenticationForServer, BlazorAuto_API.Infrastructure.AuthenticationForServerService>();
+builder.Services.AddScoped<IAuthentication, WebApp.AuthenticationForServerService>();
 
 //builder.Services.AddScoped(provider =>
 //{

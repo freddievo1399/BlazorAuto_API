@@ -13,7 +13,7 @@ namespace BlazorAuto_API.Admin.Abstract
     [BasePath("/api/admin/productdetail")]
     public interface IProductDetailService
     {
-        [Feature("Danh mục", "Quản lý danh mục")]
+        [Feature("Danh mục", "Cấu hình sản phẩm")]
         public enum PERMISSION
         {
             [Permistion("Xem danh sách")]

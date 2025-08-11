@@ -17,7 +17,7 @@ using Syncfusion.Blazor.Charts;
 
 namespace BlazorAuto_API.Infrastructure
 {
-    public class IAuthenticationForServerService : IAuthenticationForServer
+    public class AuthenticationForServerService : IAuthenticationForServer
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
@@ -25,7 +25,7 @@ namespace BlazorAuto_API.Infrastructure
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDbContext _DbContext;
 
-        public IAuthenticationForServerService(
+        public AuthenticationForServerService(
             IDbContext db,
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,

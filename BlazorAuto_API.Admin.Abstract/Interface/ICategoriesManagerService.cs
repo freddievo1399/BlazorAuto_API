@@ -12,7 +12,7 @@ namespace BlazorAuto_API.Admin.Abstract
     [BasePath("/api/admin/CategoriesManager")]
     public interface ICategoriesManagerService
     {
-        [Feature("Danh mục", "Quản lý danh mục")]
+        [Feature("Danh mục", "Quản lý danh mục hàng hóa")]
         public enum PERMISSION
         {
             [Permistion("Xem danh sách")]

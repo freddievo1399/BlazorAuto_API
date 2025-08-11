@@ -13,7 +13,7 @@ namespace BlazorAuto_API.Admin.Abstract
 
     public interface IManagerUser
     {
-        [Feature("Danh mục", "Quản lý danh mục")]
+        [Feature("Quản lý user", "Quản lý người dùng")]
         public enum PERMISSION
         {
             [Permistion("Xem danh sách")]
